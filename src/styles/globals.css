@@ -1,1 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+:root {
+  --color-graphite: #2b2b2b;
+  --color-gold: #bfa24b;
+}
+
+body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; color: var(--color-graphite); background-color: #fff; }
+
+.btn { @apply inline-flex items-center justify-center rounded-2xl px-5 py-2.5 font-semibold transition; }
+.btn-primary { @apply btn bg-graphite text-white; }
+.btn-accent { @apply btn bg-gold text-graphite; }
