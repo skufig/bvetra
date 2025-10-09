@@ -7,7 +7,7 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
   const rafRef = useRef<number | null>(null)
   const startRef = useRef<number | null>(null)
 
-  const LOOP_DURATION = 30000 // long, smooth loop in ms
+  const LOOP_DURATION = 30000 // ms — длинный плавный цикл
   const REDUCED_MOTION = typeof window !== 'undefined' && window.matchMedia
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
     : false
@@ -20,18 +20,10 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
     const path = pathRef.current
     if (!svg || !car || !path) return
 
-    // detect SMIL support (modern WebKit may block SMIL; fallback will run if unsupported)
-    const supportsSMIL = (() => {
-      try {
-        return typeof (document.createElementNS as any) === 'function' &&
-          !!svg.querySelector('animateMotion')
-      } catch {
-        return false
-      }
-    })()
+    const supportsSMIL = !!svg.querySelector('animateMotion')
 
     if (supportsSMIL) {
-      return // let SMIL run where available
+      return // SMIL выполнит анимацию там, где поддерживается
     }
 
     const pathLen = path.getTotalLength()
@@ -87,20 +79,18 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
           <feDropShadow dx="0" dy="8" stdDeviation="10" floodColor="rgba(0,0,0,0.28)" />
         </filter>
 
-        <!-- figure-eight path -->
         <path
           id="figure8path"
+          ref={pathRef as any}
           d="M180,80 C 260,10 340,10 260,80 C 200,150 120,150 180,80 C 240,10 140,10 180,80 Z"
           fill="none"
         />
       </defs>
 
-      {/* faint guide curve (decorative) */}
       <g opacity="0.06">
         <use href="#figure8path" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
       </g>
 
-      {/* glow trail */}
       <g aria-hidden="true">
         <path
           d="M180,80 C 260,10 340,10 260,80 C 200,150 120,150 180,80 C 240,10 140,10 180,80 Z"
@@ -114,15 +104,12 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
         />
       </g>
 
-      {/* car group - silhouette in bold black, orange accents for wheels and motion lines */}
       <g id="car" ref={carRef as any} transform="translate(-28,-18)" filter="url(#drop)">
-        {/* body - bold black silhouette */}
         <g id="body" fill="#0b0b0b">
           <path d="M28 56 L64 34 L304 34 L340 56 L356 74 Q362 94 344 108 L316 122 L64 122 Q50 118 36 108 Q22 98 28 56 Z" />
           <path d="M170 36 L204 36 L222 52 L186 52 Z" fill="rgba(255,255,255,0.12)" />
         </g>
 
-        {/* wheels - orange rims */}
         <g id="wheels">
           <g transform="translate(96,126)">
             <circle cx="0" cy="0" r="12" fill="#111" />
@@ -134,21 +121,18 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
           </g>
         </g>
 
-        {/* subtle orange stripe */}
         <path d="M64 64 C 120 46 240 46 312 64" stroke="url(#orangeGrad)" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.9" />
       </g>
 
-      {/* motion lines above car (orange) */}
       <g id="motionLines" stroke="url(#orangeGrad)" strokeWidth="3" strokeLinecap="round" opacity="0.95">
         <path d="M14 28 L40 20" />
         <path d="M6 40 L48 26" />
         <path d="M24 12 L60 28" />
       </g>
 
-      {/* SMIL animateMotion primary; JS fallback in useEffect handles unsupported SMIL */}
       <g style={{ display: REDUCED_MOTION ? 'none' : undefined }}>
         <animateMotion xlinkHref="#car" href="#car" dur="30s" repeatCount="indefinite" rotate="auto">
-          <mpath xlinkHref="#figure8path" />
+          <mpath xlinkHref="#figure8path" href="#figure8path" />
         </animateMotion>
 
         <animateTransform
@@ -173,7 +157,6 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
         />
       </g>
 
-      {/* CSS for pulsing trail and hover micro-parallax; respects reduced motion */}
       <style jsx>{`
         svg { display: block; overflow: visible; }
         @media (prefers-reduced-motion: no-preference) {
@@ -188,4 +171,4 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
       `}</style>
     </svg>
   )
-      }
+}
