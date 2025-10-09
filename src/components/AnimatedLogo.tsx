@@ -1,13 +1,13 @@
 import React, { useEffect, useRef } from 'react'
 
-export default function AnimatedLogo({ className = '' }: { className?: string }) {
+export default function AnimatedSportsCarLogo({ className = '' }: { className?: string }) {
   const svgRef = useRef<SVGSVGElement | null>(null)
   const carRef = useRef<SVGGElement | null>(null)
   const pathRef = useRef<SVGPathElement | null>(null)
   const rafRef = useRef<number | null>(null)
   const startRef = useRef<number | null>(null)
 
-  const LOOP_DURATION = 30000
+  const LOOP_DURATION = 4000
   const REDUCED_MOTION = typeof window !== 'undefined' && window.matchMedia
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
     : false
@@ -19,27 +19,37 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
     const path = pathRef.current
     if (!svg || !car || !path) return
 
-    const supportsSMIL = !!svg.querySelector('animateMotion')
-    if (supportsSMIL) return
-
     const pathLen = path.getTotalLength()
-    const ease = (t: number) => (1 - Math.cos(Math.PI * t)) / 2
+    
+    function easeOutCubic(t: number): number {
+      return 1 - Math.pow(1 - t, 3)
+    }
 
     function step(ts: number) {
       if (!startRef.current) startRef.current = ts
       const elapsed = (ts - startRef.current) % LOOP_DURATION
-      const t = elapsed / LOOP_DURATION
-      const eased = ease(t)
-      const dist = eased * pathLen
+      const t = (elapsed / LOOP_DURATION) * 2
+      const segment = Math.floor(t) % 2
+      const progress = t % 1
+      
+      let easedProgress
+      if (segment === 0) {
+        // Первая половина пути - ускорение
+        easedProgress = easeOutCubic(progress)
+      } else {
+        // Вторая половина пути - замедление
+        easedProgress = 1 - easeOutCubic(1 - progress)
+      }
+      
+      const totalProgress = (segment + easedProgress) / 2
+      const dist = totalProgress * pathLen
 
       const p = path.getPointAtLength(dist)
-      const delta = 0.8
-      const next = path.getPointAtLength(Math.min(dist + delta, pathLen))
+      const lookAhead = Math.min(dist + 2, pathLen)
+      const next = path.getPointAtLength(lookAhead)
       const angle = Math.atan2(next.y - p.y, next.x - p.x) * (180 / Math.PI)
 
-      const offsetX = -160 * 0.12
-      const offsetY = -80 * 0.12
-      car.setAttribute('transform', `translate(${p.x + offsetX}, ${p.y + offsetY}) rotate(${angle})`)
+      car.setAttribute('transform', `translate(${p.x - 45}, ${p.y - 20}) rotate(${angle})`)
 
       rafRef.current = window.requestAnimationFrame(step)
     }
@@ -47,130 +57,235 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
     rafRef.current = window.requestAnimationFrame(step)
     return () => {
       if (rafRef.current) window.cancelAnimationFrame(rafRef.current)
-      rafRef.current = null
-      startRef.current = null
     }
   }, [REDUCED_MOTION])
 
   return (
     <svg
       ref={svgRef}
-      viewBox="0 0 360 160"
-      width="240"
-      height="106"
+      viewBox="0 0 200 100"
+      width="200"
+      height="100"
       className={className}
       role="img"
-      aria-label="Animated sports car logo"
+      aria-label="Sports car logo"
       xmlns="http://www.w3.org/2000/svg"
-      xmlnsXlink="http://www.w3.org/1999/xlink"
     >
       <defs>
-        <linearGradient id="gOr" x1="0" x2="1">
-          <stop offset="0%" stopColor="#ff9a3c" />
-          <stop offset="100%" stopColor="#ff6a00" />
+        {/* Градиенты */}
+        <linearGradient id="carGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#ff6a00" />
+          <stop offset="50%" stopColor="#ff3d00" />
+          <stop offset="100%" stopColor="#ff1744" />
         </linearGradient>
 
-        <linearGradient id="gGold" x1="0" x2="1">
-          <stop offset="0%" stopColor="var(--primary, #b88a3a)" />
-          <stop offset="100%" stopColor="var(--primary-600, #8f6a2a)" />
+        <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#00e5ff" />
+          <stop offset="100%" stopColor="#2979ff" />
         </linearGradient>
 
-        <filter id="sh" x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow dx="0" dy="8" stdDeviation="10" floodColor="rgba(0,0,0,0.36)" />
+        <linearGradient id="wheelGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#37474f" />
+          <stop offset="100%" stopColor="#102027" />
+        </linearGradient>
+
+        <linearGradient id="glassGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#78909c" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#37474f" stopOpacity="0.8" />
+        </linearGradient>
+
+        {/* Тени и эффекты */}
+        <filter id="carShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="2" dy="4" stdDeviation="3" floodColor="#000000" floodOpacity="0.3" />
         </filter>
 
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+
+        {/* Траектория движения */}
         <path
-          id="fig8"
+          id="motionPath"
           ref={pathRef as any}
-          d="M180,80 C 260,12 340,12 260,80 C 200,148 120,148 180,80 C 240,12 140,12 180,80 Z"
+          d="M 20,50 C 40,20 160,20 180,50 C 200,80 40,80 20,50 Z"
           fill="none"
+          stroke="none"
         />
       </defs>
 
-      <g opacity="0.06">
-        <use href="#fig8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      </g>
+      {/* Фоновая траектория */}
+      <path
+        d="M 20,50 C 40,20 160,20 180,50 C 200,80 40,80 20,50 Z"
+        fill="none"
+        stroke="url(#accentGradient)"
+        strokeWidth="1.5"
+        strokeDasharray="4 3"
+        opacity="0.3"
+      />
 
-      <g aria-hidden="true">
+      {/* Машина */}
+      <g ref={carRef as any} filter="url(#carShadow)">
+        {/* Основной кузов */}
         <path
-          d="M180,80 C 260,12 340,12 260,80 C 200,148 120,148 180,80 C 240,12 140,12 180,80 Z"
-          stroke="url(#gOr)"
-          strokeWidth="6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          opacity="0.16"
-          filter="url(#sh)"
+          d="M 10,30 L 15,25 L 25,20 L 75,20 L 85,25 L 90,30 L 92,35 L 92,40 L 90,45 L 85,50 L 75,55 L 25,55 L 15,50 L 10,45 L 8,40 L 8,35 Z"
+          fill="url(#carGradient)"
+          stroke="#000"
+          strokeWidth="0.5"
         />
-      </g>
 
-      <g id="car" ref={carRef as any} transform="translate(-43,-22)" filter="url(#sh)">
-        <g id="carBody" transform="scale(0.9)" fill="#060606">
-          <path d="M24 62 C40 34 88 18 164 18 C240 18 296 36 324 70 C332 82 332 98 318 110 C300 128 264 128 160 128 C70 128 46 118 28 102 C14 90 16 74 24 62 Z" />
-          <path d="M176 34 C196 34 218 46 232 62 C208 58 186 50 176 34 Z" fill="rgba(255,255,255,0.12)" />
-        </g>
+        {/* Лобовое стекло */}
+        <path
+          d="M 25,25 L 35,22 L 65,22 L 75,25 L 75,35 L 65,32 L 35,32 Z"
+          fill="url(#glassGradient)"
+          stroke="#000"
+          strokeWidth="0.3"
+        />
 
-        <g id="wheels" transform="translate(0,0)">
-          <g transform="translate(112,118)">
-            <circle cx="0" cy="0" r="14" fill="#030303" />
-            <circle cx="0" cy="0" r="6.6" fill="url(#gOr)" />
+        {/* Заднее стекло */}
+        <path
+          d="M 15,35 L 25,32 L 25,42 L 15,45 Z"
+          fill="url(#glassGradient)"
+          stroke="#000"
+          strokeWidth="0.3"
+        />
+
+        {/* Боковая полоса */}
+        <path
+          d="M 20,35 L 80,35 L 80,45 L 20,45 Z"
+          fill="url(#accentGradient)"
+          stroke="#000"
+          strokeWidth="0.3"
+          opacity="0.9"
+        />
+
+        {/* Передний бампер */}
+        <path
+          d="M 85,28 L 90,30 L 90,40 L 85,42 L 80,40 L 80,30 Z"
+          fill="#263238"
+          stroke="#000"
+          strokeWidth="0.3"
+        />
+
+        {/* Задний бампер */}
+        <path
+          d="M 10,32 L 15,30 L 20,32 L 20,42 L 15,44 L 10,42 Z"
+          fill="#263238"
+          stroke="#000"
+          strokeWidth="0.3"
+        />
+
+        {/* Передняя фара */}
+        <ellipse cx="87" cy="35" rx="3" ry="2" fill="#ffff00" filter="url(#glow)" />
+        
+        {/* Задняя фара */}
+        <ellipse cx="13" cy="35" rx="2" ry="1.5" fill="#ff3d00" filter="url(#glow)" />
+
+        {/* Колеса */}
+        <g>
+          {/* Переднее колесо */}
+          <g transform="translate(25, 55)">
+            <circle cx="0" cy="0" r="8" fill="url(#wheelGradient)" stroke="#000" strokeWidth="0.5" />
+            <circle cx="0" cy="0" r="4" fill="#455a64" stroke="#000" strokeWidth="0.3" />
+            <circle cx="0" cy="0" r="1.5" fill="#cfd8dc" />
+            {/* Спицы */}
+            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
+              <line
+                key={angle}
+                x1="0"
+                y1="0"
+                x2={Math.cos(angle * Math.PI / 180) * 6}
+                y2={Math.sin(angle * Math.PI / 180) * 6}
+                stroke="#78909c"
+                strokeWidth="0.8"
+              />
+            ))}
           </g>
-          <g transform="translate(260,122)">
-            <circle cx="0" cy="0" r="14" fill="#030303" />
-            <circle cx="0" cy="0" r="6.6" fill="url(#gOr)" />
+
+          {/* Заднее колесо */}
+          <g transform="translate(75, 55)">
+            <circle cx="0" cy="0" r="8" fill="url(#wheelGradient)" stroke="#000" strokeWidth="0.5" />
+            <circle cx="0" cy="0" r="4" fill="#455a64" stroke="#000" strokeWidth="0.3" />
+            <circle cx="0" cy="0" r="1.5" fill="#cfd8dc" />
+            {/* Спицы */}
+            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
+              <line
+                key={angle}
+                x1="0"
+                y1="0"
+                x2={Math.cos(angle * Math.PI / 180) * 6}
+                y2={Math.sin(angle * Math.PI / 180) * 6}
+                stroke="#78909c"
+                strokeWidth="0.8"
+              />
+            ))}
           </g>
         </g>
 
-        <path d="M48 72 C112 54 232 54 300 72" stroke="url(#gOr)" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.95" />
-
-        <g id="headlights" opacity="0.12">
-          <ellipse cx="312" cy="70" rx="8" ry="4" fill="#fff" />
-          <ellipse cx="304" cy="68" rx="4" ry="2" fill="#fff" />
+        {/* Вентиляционные решетки */}
+        <g opacity="0.7">
+          <rect x="40" y="32" width="15" height="3" rx="1" fill="#37474f" />
+          <rect x="45" y="37" width="10" height="2" rx="1" fill="#37474f" />
         </g>
-      </g>
 
-      <g id="speed" stroke="url(#gOr)" strokeWidth="3" strokeLinecap="round" opacity="0.98">
-        <path d="M12 26 L48 18" />
-        <path d="M6 40 L56 26" />
-        <path d="M28 10 L72 32" />
-      </g>
-
-      <g style={{ display: REDUCED_MOTION ? 'none' : undefined }}>
-        <animateMotion xlinkHref="#car" href="#car" dur="30s" repeatCount="indefinite" rotate="auto">
-          <mpath xlinkHref="#fig8" />
-        </animateMotion>
-
-        <animateTransform
-          xlinkHref="#carBody"
-          attributeName="transform"
-          type="scale"
-          dur="9s"
-          values="0.9;0.905;0.9"
-          keyTimes="0;0.5;1"
-          repeatCount="indefinite"
-        />
-
-        <animateTransform
-          xlinkHref="#wheels"
-          attributeName="transform"
-          type="rotate"
-          from="0 0 0"
-          to="360 0 0"
-          dur="1.05s"
-          repeatCount="indefinite"
-          additive="sum"
+        {/* Спойлер */}
+        <path
+          d="M 70,18 L 80,15 L 82,18 L 70,20 Z"
+          fill="#d32f2f"
+          stroke="#000"
+          strokeWidth="0.3"
         />
       </g>
+
+      {/* Анимационные элементы */}
+      {!REDUCED_MOTION && (
+        <>
+          {/* Эффект скорости */}
+          <g opacity="0.6">
+            <animate 
+              attributeName="opacity"
+              values="0.2;0.8;0.2"
+              dur="1.5s"
+              repeatCount="indefinite"
+            />
+            <path
+              d="M 5,45 L 15,40"
+              stroke="url(#accentGradient)"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <path
+              d="M 5,50 L 12,48"
+              stroke="url(#accentGradient)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+          </g>
+        </>
+      )}
 
       <style jsx>{`
-        svg { display:block; overflow:visible; }
-        @media (prefers-reduced-motion: no-preference) {
-          #trailPulse, #speed { animation: pulse 7.2s ease-in-out infinite; }
-          @keyframes pulse { 0%{ opacity:0.06 } 50%{ opacity:0.22 } 100%{ opacity:0.06 } }
-          svg:hover #car { transform-origin: center; transition: transform 420ms ease; transform: translateY(-3px) scale(1.004); }
+        svg {
+          display: block;
+          overflow: visible;
+          max-width: 100%;
+          height: auto;
         }
+        
         @media (prefers-reduced-motion: reduce) {
-          #car animateMotion, #car animateTransform, #wheels animateTransform { display: none; }
+          svg {
+            animation: none;
+          }
+        }
+        
+        @media (prefers-reduced-motion: no-preference) {
+          svg:hover {
+            transform: scale(1.02);
+            transition: transform 0.3s ease;
+          }
         }
       `}</style>
     </svg>
