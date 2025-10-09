@@ -2,7 +2,15 @@ import React from 'react'
 
 export default function AnimatedLogo({ className = '' }: { className?: string }) {
   return (
-    <svg viewBox="0 0 120 60" width="40" height="20" className={className} aria-hidden="true" focusable="false" role="img">
+    <svg
+      viewBox="0 0 120 60"
+      width="40"
+      height="20"
+      className={className}
+      aria-hidden="true"
+      focusable="false"
+      role="img"
+    >
       <defs>
         <linearGradient id="lg" x1="0" x2="1" y1="0" y2="1">
           <stop offset="0%" stopColor="var(--primary)" />
@@ -14,21 +22,21 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
         </filter>
       </defs>
 
-      <!-- Car body -->
+      {/* Car body */}
       <g transform="translate(0,0)" filter="url(#shadow)">
         <rect x="6" y="18" rx="6" ry="6" width="88" height="22" fill="url(#lg)" />
         <rect x="58" y="8" rx="5" ry="5" width="28" height="16" fill="url(#lg)" />
-        <!-- windows -->
+        {/* windows */}
         <rect x="62" y="10" width="10" height="10" rx="1" fill="rgba(255,255,255,0.22)" />
         <rect x="74" y="10" width="10" height="10" rx="1" fill="rgba(255,255,255,0.16)" />
-        <!-- wheels -->
+        {/* wheels */}
         <circle cx="26" cy="44" r="6" fill="#111" />
         <circle cx="78" cy="44" r="6" fill="#111" />
         <circle cx="26" cy="44" r="3" fill="rgba(255,255,255,0.12)" />
         <circle cx="78" cy="44" r="3" fill="rgba(255,255,255,0.12)" />
       </g>
 
-      <!-- Motion lines -->
+      {/* Motion lines */}
       <g id="motion" fill="none" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round" opacity="0.9">
         <path d="M-6 28 L0 28" />
         <path d="M-12 34 L-4 34" />
@@ -57,4 +65,4 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
       `}</style>
     </svg>
   )
-          }
+}
