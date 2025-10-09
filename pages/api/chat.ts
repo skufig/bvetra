@@ -16,10 +16,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     // Build a concise prompt: system + history + user message
-    const systemPrompt = "You are a helpful assistant for Bvetra website. Help users navigate, answer questions about services and fleet, and assist in creating booking requests by asking required fields. Be concise and friendly."
+    const systemPrompt =
+      'You are a helpful assistant for Bvetra website. Help users navigate, answer questions about services and fleet, and assist in creating booking requests by asking required fields. Be concise and friendly.'
     const messages = [
       { role: 'system', content: systemPrompt },
-      ...(body.messages || []).map(m => ({ role: m.role, content: m.content })),
+      ...(body.messages || []).map((m) => ({ role: m.role, content: m.content })),
       { role: 'user', content: body.message }
     ]
 
@@ -27,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${OPENAI_API_KEY}` },
       body: JSON.stringify({
-        model: 'gpt-4o-mini', // change as available; fallback to 'gpt-4o' or 'gpt-4' depending on access
+        model: 'gpt-4o-mini',
         messages,
         max_tokens: 700,
         temperature: 0.2
@@ -41,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const data = await resp.json()
-    const reply = data.choices?.[0]?.message?.content || (isEn ? 'Sorry, no reply' : 'Извините, нет ответа')
+    const reply = data.choices?.[0]?.message?.content || 'Извините, нет ответа'
     return res.status(200).json({ ok: true, reply })
   } catch (e) {
     console.error('chat error', e)
