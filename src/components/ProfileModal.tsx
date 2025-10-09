@@ -1,11 +1,11 @@
 // src/components/ProfileModal.tsx
 import React from 'react'
 
-export default function ProfileModal({ open, onClose }: { open: boolean; onClose: ()=>void }) {
+export default function ProfileModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   if (!open) return null
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose}/>
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="bg-white dark:bg-[#071017] p-6 rounded-lg shadow-lg max-w-sm w-full text-center">
         <h3 className="text-lg font-semibold mb-4">Профиль</h3>
         <p className="text-sm text-gray-600 mb-4">В разработке</p>
