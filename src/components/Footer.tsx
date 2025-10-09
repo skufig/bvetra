@@ -1,4 +1,3 @@
-// src/components/Footer.tsx
 import React, { useEffect, useState } from 'react'
 import { FiPhone, FiMail, FiClock, FiInstagram, FiHome, FiMessageCircle, FiUser } from 'react-icons/fi'
 import { FaTelegramPlane } from 'react-icons/fa'
@@ -8,7 +7,7 @@ import ChatModal from './ChatModal'
 import ProfileModal from './ProfileModal'
 import BottomNav from './BottomNav'
 
-// Константы для повторно используемых данных
+// Константы
 const CONTACT_INFO = {
   phone: '+375291234567',
   email: 'support@bvetra.example',
@@ -96,67 +95,45 @@ export default function Footer({ langProp }: { langProp?: 'ru' | 'en' }) {
 
   return (
     <>
-      <footer className="bg-white dark:bg-[#071018] border-t dark:border-gray-800">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-            
-            {/* Branding & Contact - ТОЛЬКО ОДИН РАЗ */}
-            <div className="lg:col-span-1 space-y-6">
-              <div>
-                <h2 className="font-extrabold text-2xl lg:text-3xl leading-tight text-transparent bg-clip-text fire-gradient animate-fire mb-2">
-                  Быстрее Ветра
-                </h2>
-                <p className="text-gray-500 dark:text-gray-400 text-sm lg:text-base leading-relaxed">
-                  {isEn
-                    ? 'Corporate transfers — reliable, comfortable, punctual.'
-                    : 'Корпоративные трансферы — надёжно, комфортно, вовремя.'}
-                </p>
-              </div>
+      {/* Основной футер */}
+      <footer className="bg-white dark:bg-[#071018] border-t border-gray-200 dark:border-gray-800 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+          {/* Контент */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 
+            {/* Брендинг и контакты */}
+            <div className="space-y-6">
+              <h2 className="font-extrabold text-2xl lg:text-3xl leading-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-indigo-600 mb-2 animate-fire">
+                Быстрее Ветра
+              </h2>
+              <p className="text-gray-500 dark:text-gray-400 text-sm lg:text-base leading-relaxed">
+                {isEn ? 'Corporate transfers — reliable, comfortable, punctual.' : 'Корпоративные трансферы — надёжно, комфортно, вовремя.'}
+              </p>
+              {/* Контакты */}
               <div className="space-y-3">
-                <ContactItem 
-                  icon={FiPhone} 
-                  content={CONTACT_INFO.phone} 
-                  href={`tel:${CONTACT_INFO.phone}`}
-                />
-                <ContactItem 
-                  icon={FiMail} 
-                  content={CONTACT_INFO.email} 
-                  href={`mailto:${CONTACT_INFO.email}`}
-                />
-                <ContactItem 
-                  icon={FiClock} 
-                  content={CONTACT_INFO.workHours} 
-                  isMuted
-                />
-                <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400">
-                  <span className="text-sm">📍</span>
-                  <span className="text-sm">{CONTACT_INFO.address}</span>
+                <ContactItem icon={FiPhone} content={CONTACT_INFO.phone} href={`tel:${CONTACT_INFO.phone}`} />
+                <ContactItem icon={FiMail} content={CONTACT_INFO.email} href={`mailto:${CONTACT_INFO.email}`} />
+                <ContactItem icon={FiClock} content={CONTACT_INFO.workHours} isMuted />
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm">
+                  <span>📍</span>
+                  <span>{CONTACT_INFO.address}</span>
                 </div>
               </div>
             </div>
 
-            {/* Navigation - ТОЛЬКО ОДИН РАЗ */}
+            {/* Навигация */}
             <div className="space-y-8">
-              <div>
-                <h4 className={sectionTitle}>{isEn ? 'Navigation' : 'Навигация'}</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {NAVIGATION_LINKS[lang].map((item, index) => (
-                    <button 
-                      key={index}
-                      onClick={() => handleNavigation(item.action)}
-                      className={buttonStyle}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                </div>
+              <h4 className={sectionTitle}>{isEn ? 'Navigation' : 'Навигация'}</h4>
+              <div className="grid grid-cols-2 gap-2">
+                {NAVIGATION_LINKS[lang].map((item, index) => (
+                  <button key={index} onClick={() => handleNavigation(item.action)} className={buttonStyle}>
+                    {item.label}
+                  </button>
+                ))}
               </div>
-
+              {/* Компания */}
               <div>
-                <h5 className="font-medium mb-3 text-gray-900 dark:text-white">
-                  {isEn ? 'Company' : 'Компания'}
-                </h5>
+                <h5 className="font-medium mb-3 text-gray-900 dark:text-white">{isEn ? 'Company' : 'Компания'}</h5>
                 <ul className="space-y-2">
                   {COMPANY_LINKS[lang].map((link, index) => (
                     <li key={index}>
@@ -167,24 +144,20 @@ export default function Footer({ langProp }: { langProp?: 'ru' | 'en' }) {
               </div>
             </div>
 
-            {/* App & Support - ТОЛЬКО ОДИН РАЗ */}
+            {/* Приложение и Поддержка */}
             <div className="space-y-8">
-              <div>
-                <h4 className={sectionTitle}>{isEn ? 'App & Links' : 'Приложение и ссылки'}</h4>
-                <div className="flex flex-col gap-3 max-w-xs">
-                  <button className="px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
-                    App Store
-                  </button>
-                  <button className="px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
-                    Google Play
-                  </button>
-                </div>
+              <h4 className={sectionTitle}>{isEn ? 'App & Links' : 'Приложение и ссылки'}</h4>
+              <div className="flex flex-col gap-3 max-w-xs">
+                <button className="px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+                  App Store
+                </button>
+                <button className="px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+                  Google Play
+                </button>
               </div>
-
+              {/* Поддержка */}
               <div>
-                <h5 className="font-medium mb-3 text-gray-900 dark:text-white">
-                  {isEn ? 'Support' : 'Поддержка'}
-                </h5>
+                <h5 className="font-medium mb-3 text-gray-900 dark:text-white">{isEn ? 'Support' : 'Поддержка'}</h5>
                 <div className="space-y-2">
                   {SUPPORT_LINKS[lang].map((link, index) => (
                     <div key={index} className={linkStyle}>{link}</div>
@@ -193,25 +166,16 @@ export default function Footer({ langProp }: { langProp?: 'ru' | 'en' }) {
               </div>
             </div>
 
-            {/* Social Links - ТОЛЬКО ОДИН РАЗ */}
+            {/* Соцсети */}
             <div className="space-y-6">
-              <div>
-                <h4 className={sectionTitle}>{isEn ? 'Social' : 'Соцсети'}</h4>
-                <div className="space-y-3">
-                  {SOCIAL_LINKS.map((social, index) => (
-                    <SocialLink 
-                      key={index}
-                      icon={social.icon}
-                      name={social.name}
-                      href={social.href}
-                      lang={lang}
-                    />
-                  ))}
-                </div>
+              <h4 className={sectionTitle}>{isEn ? 'Social' : 'Соцсети'}</h4>
+              <div className="space-y-3">
+                {SOCIAL_LINKS.map((social, index) => (
+                  <SocialLink key={index} icon={social.icon} name={social.name} href={social.href} />
+                ))}
               </div>
-
-              {/* Копирайт - ТОЛЬКО ОДИН РАЗ В КОНЦЕ */}
-              <div className="text-xs text-gray-500 dark:text-gray-400 pt-4 border-t dark:border-gray-800">
+              {/* Копирайт */}
+              <div className="text-xs text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-300 dark:border-gray-700">
                 © {new Date().getFullYear()} Быстрее Ветра
               </div>
             </div>
@@ -219,42 +183,28 @@ export default function Footer({ langProp }: { langProp?: 'ru' | 'en' }) {
         </div>
       </footer>
 
+      {/* Модальные окна */}
       <BookingModal open={openBooking} onClose={() => setOpenBooking(false)} lang={lang} />
       <ChatModal open={openChat} onClose={() => setOpenChat(false)} lang={lang} />
       <ProfileModal open={openProfile} onClose={() => setOpenProfile(false)} />
 
-      <BottomNav 
-        onOpenBooking={() => setOpenBooking(true)} 
-        onOpenChat={() => setOpenChat(true)} 
-        phone={CONTACT_INFO.phone} 
-        lang={lang} 
-      />
+      {/* Нижняя навигация */}
+      <BottomNav onOpenBooking={() => setOpenBooking(true)} onOpenChat={() => setOpenChat(true)} phone={CONTACT_INFO.phone} lang={lang} />
     </>
   )
 }
 
 // Вспомогательные компоненты
-interface ContactItemProps {
-  icon: React.ElementType
-  content: string
-  href?: string
-  isMuted?: boolean
-}
-
-function ContactItem({ icon: Icon, content, href, isMuted = false }: ContactItemProps) {
+function ContactItem({ icon: Icon, content, href, isMuted }: ContactItemProps) {
   const className = `flex items-center gap-3 text-sm ${
-    isMuted 
-      ? 'text-gray-500 dark:text-gray-400' 
-      : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:underline'
+    isMuted ? 'text-gray-500 dark:text-gray-400' : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white cursor-pointer'
   }`
-
   const contentElement = (
     <>
       <Icon size={16} />
       <span>{content}</span>
     </>
   )
-
   if (href && !isMuted) {
     return (
       <a href={href} className={className}>
@@ -262,7 +212,6 @@ function ContactItem({ icon: Icon, content, href, isMuted = false }: ContactItem
       </a>
     )
   }
-
   return (
     <div className={className}>
       {contentElement}
@@ -270,24 +219,16 @@ function ContactItem({ icon: Icon, content, href, isMuted = false }: ContactItem
   )
 }
 
-interface SocialLinkProps {
-  icon: React.ElementType
-  name: string
-  href: string
-  lang: 'ru' | 'en'
-}
-
-function SocialLink({ icon: Icon, name, href, lang }: SocialLinkProps) {
-  const displayName = lang === 'ru' && name === 'Instagram' ? 'Инстаграм' : name
+function SocialLink({ icon: Icon, name, href }: SocialLinkProps) {
   return (
-    <a 
-      href={href} 
-      target="_blank" 
+    <a
+      href={href}
+      target="_blank"
       rel="noopener noreferrer"
       className="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors group"
     >
       <Icon size={18} className="group-hover:scale-110 transition-transform" />
-      <span className="text-sm">{displayName}</span>
+      <span className="text-sm">{name}</span>
     </a>
   )
 }
