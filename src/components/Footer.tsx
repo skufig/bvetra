@@ -1,13 +1,12 @@
-е
 // src/components/Footer.tsx
-import React, { useEffect, useState } from 'react'
-import { FiPhone, FiMail, FiClock, FiInstagram, FiHome, FiMessageCircle, FiUser } from 'react-icons/fi'
-import { FaTelegramPlane } from 'react-icons/fa'
-import { SiViber, SiWhatsapp } from 'react-icons/si'
-import BookingModal from './BookingModal'
-import ChatModal from './ChatModal'
-import ProfileModal from './ProfileModal'
-import BottomNav from './BottomNav'
+import React, { useEffect, useState } from 'react';
+import { FiPhone, FiMail, FiClock, FiInstagram, FiHome, FiMessageCircle, FiUser } from 'react-icons/fi';
+import { FaTelegramPlane } from 'react-icons/fa';
+import { SiViber, SiWhatsapp } from 'react-icons/si';
+import BookingModal from './BookingModal';
+import ChatModal from './ChatModal';
+import ProfileModal from './ProfileModal';
+import BottomNav from './BottomNav';
 
 // Константы для повторно используемых данных
 const CONTACT_INFO = {
@@ -15,14 +14,14 @@ const CONTACT_INFO = {
   email: 'support@bvetra.example',
   workHours: '08:00 — 22:00',
   address: 'г. Москва'
-} as const
+} as const;
 
 const SOCIAL_LINKS = [
   { icon: FiInstagram, name: 'Instagram', href: 'https://instagram.com' },
   { icon: FaTelegramPlane, name: 'Telegram', href: 'https://t.me' },
   { icon: SiViber, name: 'Viber', href: '#' },
   { icon: SiWhatsapp, name: 'WhatsApp', href: '#' }
-] as const
+] as const;
 
 const NAVIGATION_LINKS = {
   ru: [
@@ -37,63 +36,65 @@ const NAVIGATION_LINKS = {
     { label: 'Chat', icon: FiMessageCircle, action: 'chat' },
     { label: 'Profile', icon: FiUser, action: 'profile' }
   ]
-} as const
+} as const;
 
 const COMPANY_LINKS = {
   ru: ['О компании', 'Карьера', 'Контакты'],
   en: ['About', 'Careers', 'Contacts']
-} as const
+} as const;
 
 const SUPPORT_LINKS = {
   ru: ['FAQ', 'Условия', 'Политика'],
   en: ['FAQ', 'Terms', 'Privacy']
-} as const
+} as const;
 
 export default function Footer({ langProp }: { langProp?: 'ru' | 'en' }) {
   const [lang, setLang] = useState<'ru' | 'en'>(() => {
     try {
-      const stored = typeof window !== 'undefined' ? localStorage.getItem('lang') : null
-      return langProp || (stored === 'en' ? 'en' : 'ru')
+      const stored = typeof window !== 'undefined' ? localStorage.getItem('lang') : null;
+      return langProp || (stored === 'en' ? 'en' : 'ru');
     } catch {
-      return langProp || 'ru'
+      return langProp || 'ru';
     }
-  })
+  });
 
   useEffect(() => {
     if (langProp && langProp !== lang) {
-      setLang(langProp)
+      setLang(langProp);
       try {
-        localStorage.setItem('lang', langProp)
+        localStorage.setItem('lang', langProp);
       } catch {}
     }
-  }, [langProp])
+  }, [langProp]);
 
-  const isEn = lang === 'en'
-  const [openBooking, setOpenBooking] = useState(false)
-  const [openChat, setOpenChat] = useState(false)
-  const [openProfile, setOpenProfile] = useState(false)
+  const isEn = lang === 'en';
+  const [openBooking, setOpenBooking] = useState(false);
+  const [openChat, setOpenChat] = useState(false);
+  const [openProfile, setOpenProfile] = useState(false);
 
   // Общие стили
-  const sectionTitle = "font-semibold mb-4 text-lg text-gray-900 dark:text-white"
-  const linkStyle = "text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-  const buttonStyle = "w-full text-left py-2 hover:underline transition-all text-gray-700 dark:text-gray-300"
+  const sectionTitle = "font-semibold mb-4 text-lg text-gray-900 dark:text-white";
+  const linkStyle = "text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors";
+  const buttonStyle = "w-full text-left py-2 hover:underline transition-all text-gray-700 dark:text-gray-300";
 
   const handleNavigation = (action: string) => {
     switch (action) {
       case 'home':
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-        break
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        break;
       case 'booking':
-        setOpenBooking(true)
-        break
+        setOpenBooking(true);
+        break;
       case 'chat':
-        setOpenChat(true)
-        break
+        setOpenChat(true);
+        break;
       case 'profile':
-        setOpenProfile(true)
-        break
+        setOpenProfile(true);
+        break;
+      default:
+        break;
     }
-  }
+  };
 
   return (
     <>
@@ -101,7 +102,7 @@ export default function Footer({ langProp }: { langProp?: 'ru' | 'en' }) {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             
-            {/* Branding & Contact - ТОЛЬКО ОДИН РАЗ */}
+            {/* Branding & Contact */}
             <div className="lg:col-span-1 space-y-6">
               <div>
                 <h2 className="font-extrabold text-2xl lg:text-3xl leading-tight text-transparent bg-clip-text fire-gradient animate-fire mb-2">
@@ -137,7 +138,7 @@ export default function Footer({ langProp }: { langProp?: 'ru' | 'en' }) {
               </div>
             </div>
 
-            {/* Navigation - ТОЛЬКО ОДИН РАЗ */}
+            {/* Navigation */}
             <div className="space-y-8">
               <div>
                 <h4 className={sectionTitle}>{isEn ? 'Navigation' : 'Навигация'}</h4>
@@ -168,7 +169,7 @@ export default function Footer({ langProp }: { langProp?: 'ru' | 'en' }) {
               </div>
             </div>
 
-            {/* App & Support - ТОЛЬКО ОДИН РАЗ */}
+            {/* App & Support */}
             <div className="space-y-8">
               <div>
                 <h4 className={sectionTitle}>{isEn ? 'App & Links' : 'Приложение и ссылки'}</h4>
@@ -194,7 +195,7 @@ export default function Footer({ langProp }: { langProp?: 'ru' | 'en' }) {
               </div>
             </div>
 
-            {/* Social Links - ТОЛЬКО ОДИН РАЗ */}
+            {/* Social Links */}
             <div className="space-y-6">
               <div>
                 <h4 className={sectionTitle}>{isEn ? 'Social' : 'Соцсети'}</h4>
@@ -211,7 +212,7 @@ export default function Footer({ langProp }: { langProp?: 'ru' | 'en' }) {
                 </div>
               </div>
 
-              {/* Копирайт - ТОЛЬКО ОДИН РАЗ В КОНЦЕ */}
+              {/* Копирайт */}
               <div className="text-xs text-gray-500 dark:text-gray-400 pt-4 border-t dark:border-gray-800">
                 © {new Date().getFullYear()} Быстрее Ветра
               </div>
@@ -231,15 +232,15 @@ export default function Footer({ langProp }: { langProp?: 'ru' | 'en' }) {
         lang={lang} 
       />
     </>
-  )
+  );
 }
 
 // Вспомогательные компоненты
 interface ContactItemProps {
-  icon: React.ElementType
-  content: string
-  href?: string
-  isMuted?: boolean
+  icon: React.ElementType;
+  content: string;
+  href?: string;
+  isMuted?: boolean;
 }
 
 function ContactItem({ icon: Icon, content, href, isMuted = false }: ContactItemProps) {
@@ -247,39 +248,39 @@ function ContactItem({ icon: Icon, content, href, isMuted = false }: ContactItem
     isMuted 
       ? 'text-gray-500 dark:text-gray-400' 
       : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:underline'
-  }`
+  }`;
 
   const contentElement = (
     <>
       <Icon size={16} />
       <span>{content}</span>
     </>
-  )
+  );
 
   if (href && !isMuted) {
     return (
       <a href={href} className={className}>
         {contentElement}
       </a>
-    )
+    );
   }
 
   return (
     <div className={className}>
       {contentElement}
     </div>
-  )
+  );
 }
 
 interface SocialLinkProps {
-  icon: React.ElementType
-  name: string
-  href: string
-  lang: 'ru' | 'en'
+  icon: React.ElementType;
+  name: string;
+  href: string;
+  lang: 'ru' | 'en';
 }
 
 function SocialLink({ icon: Icon, name, href, lang }: SocialLinkProps) {
-  const displayName = lang === 'ru' && name === 'Instagram' ? 'Инстаграм' : name
+  const displayName = lang === 'ru' && name === 'Instagram' ? 'Инстаграм' : name;
   return (
     <a 
       href={href} 
@@ -290,5 +291,5 @@ function SocialLink({ icon: Icon, name, href, lang }: SocialLinkProps) {
       <Icon size={18} className="group-hover:scale-110 transition-transform" />
       <span className="text-sm">{displayName}</span>
     </a>
-  )
+  );
 }
