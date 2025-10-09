@@ -2,12 +2,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { FiX, FiSend } from 'react-icons/fi'
 
-type Props = { open: boolean; onClose: () => void; lang?: 'ru'|'en' }
+type Props = { open: boolean; onClose: ()=>void; lang?: 'ru'|'en' }
 
 type Msg = { id: string; role: 'user'|'assistant'|'system'; text: string }
 
 export default function ChatModal({ open, onClose, lang='ru' }: Props) {
-  const isEn = lang==='en'
+  const isEn = lang === 'en'
   const [messages, setMessages] = useState<Msg[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -16,7 +16,7 @@ export default function ChatModal({ open, onClose, lang='ru' }: Props) {
   useEffect(() => {
     if (!open) { setMessages([]); setInput('') }
     else {
-      const sys: Msg = { id: 'sys-1', role: 'system', text: isEn ? 'You are a helpful assistant for Bvetra' : 'Вы помощник сайта Bvetra' }
+      const sys: Msg = { id:'sys-1', role:'system', text: isEn ? 'You are a helpful assistant for Bvetra website.' : 'Вы помощник сайта Bvetra.' }
       setMessages([sys])
       document.body.style.overflow = 'hidden'
     }
@@ -27,15 +27,14 @@ export default function ChatModal({ open, onClose, lang='ru' }: Props) {
 
   async function sendMessage(text: string) {
     if (!text.trim()) return
-    const userMsg: Msg = { id:`u-${Date.now()}`, role:'user', text }
+    const userMsg = { id:`u-${Date.now()}`, role:'user', text }
     setMessages(s=>[...s,userMsg])
-    setInput('')
-    setLoading(true)
+    setInput(''); setLoading(true)
     try {
-      const res = await fetch('/api/chat',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ message:text, messages }) })
+      const res = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ message:text, messages }) })
       const json = await res.json()
-      if (res.ok && json.reply) setMessages(s=>[...s,{ id:`a-${Date.now()}`, role:'assistant', text:json.reply }])
-      else setMessages(s=>[...s,{ id:`a-${Date.now()}`, role:'assistant', text: isEn ? 'Sorry, something went wrong' : 'Извините, ошибка' }])
+      if (res.ok && json.reply) setMessages(s=>[...s,{ id:`a-${Date.now()}`, role:'assistant', text: json.reply }])
+      else setMessages(s=>[...s,{ id:`a-${Date.now()}`, role:'assistant', text: isEn ? 'Sorry, error' : 'Ошибка' }])
     } catch {
       setMessages(s=>[...s,{ id:`a-${Date.now()}`, role:'assistant', text: isEn ? 'Network error' : 'Ошибка сети' }])
     } finally { setLoading(false) }
@@ -46,7 +45,7 @@ export default function ChatModal({ open, onClose, lang='ru' }: Props) {
   return (
     <div className="fixed inset-0 z-[9999] flex items-end md:items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose}/>
-      <div className="relative w-full max-w-lg mx-4 bg-white dark:bg-[#0b0a09] rounded-t-xl md:rounded-xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-lg mx-4 bg-white dark:bg-[#061018] rounded-t-xl md:rounded-xl shadow-2xl overflow-hidden">
         <div className="p-3 border-b flex items-center justify-between">
           <div className="font-semibold">{isEn ? 'Assistant' : 'Помощник'}</div>
           <button onClick={onClose} className="p-2 rounded hover:bg-gray-100"><FiX/></button>
@@ -54,7 +53,7 @@ export default function ChatModal({ open, onClose, lang='ru' }: Props) {
 
         <div ref={listRef} className="p-3 h-72 overflow-auto space-y-3">
           {messages.map(m => (
-            <div key={m.id} className={`max-w-[85%] ${m.role==='user' ? 'ml-auto bg-indigo-50 text-black p-2 rounded' : m.role==='assistant' ? 'bg-gray-100 p-2 rounded' : 'sr-only'}`}>
+            <div key={m.id} className={`max-w-[85%] ${m.role==='user' ? 'ml-auto bg-indigo-50 p-2 rounded' : m.role==='assistant' ? 'bg-gray-100 p-2 rounded' : 'sr-only'}`}>
               <div className="text-sm whitespace-pre-wrap">{m.text}</div>
             </div>
           ))}
