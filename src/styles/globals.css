@@ -2,13 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --color-graphite: #2b2b2b;
-  --color-gold: #bfa24b;
+/* Theme variables */
+:root{
+  --bg: #ffffff;
+  --text: #1f1f1f;
+  --primary: #cbb88f; /* gold-400 */
+  --primary-600: #a6874f; /* gold-600 */
+  --glass: rgba(255,255,255,0.6);
+  --header-height: 72px;
 }
 
-body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; color: var(--color-graphite); background-color: #fff; }
+/* Dark theme: coffee with milk tones */
+html.dark {
+  --bg: #f0e7e2; /* coffee-100 */
+  --text: #1f1410;
+  --primary: #b98f74; /* coffee-400 */
+  --primary-600: #8d5f47;
+  --glass: rgba(10,8,6,0.55);
+}
 
+/* Base body */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--text);
+  background-color: var(--bg);
+  transition: background-color 240ms ease, color 240ms ease;
+}
+
+/* Buttons */
 .btn { @apply inline-flex items-center justify-center rounded-2xl px-5 py-2.5 font-semibold transition; }
-.btn-primary { @apply btn bg-graphite text-white; }
-.btn-accent { @apply btn bg-gold text-graphite; }
+.btn-primary { background-color: var(--text); color: white; border: 0; }
+.btn-accent { background-color: var(--primary); color: var(--text); border: 0; }
+
+/* Header glass effect helper */
+.header-glass {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background-color: var(--glass);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* small animation utilities */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.motion-fadeInUp { animation: fadeInUp 420ms ease both; }
