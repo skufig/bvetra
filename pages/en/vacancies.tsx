@@ -11,7 +11,7 @@ export default function VacanciesEn() {
         <title>Vacancies — Bvetra</title>
         <meta name="description" content="Driver vacancies. Apply now." />
       </Head>
-      <Header isEn />
+      <Header />
       <main className="mx-auto max-w-4xl px-4 py-12">
         <h1 className="text-3xl font-bold text-graphite">Vacancy: Driver</h1>
         <p className="mt-3 text-gray-700">Requirements: driving experience from 2 years...</p>
