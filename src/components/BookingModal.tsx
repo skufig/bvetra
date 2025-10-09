@@ -1,4 +1,5 @@
 // components/BookingModal.tsx
+export default function BookingModal() { return null }
 import React, { useEffect, useState } from 'react'
 import { FiX, FiCheck } from 'react-icons/fi'
 
