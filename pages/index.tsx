@@ -20,6 +20,7 @@ export default function Home() {
 
       <Header onOpenModal={() => setOpen(true)} />
 
+
       <main className="mx-auto max-w-6xl px-4 py-8">
         <section className="pt-6 pb-12">
           <div className="grid md:grid-cols-2 gap-6 items-center">
