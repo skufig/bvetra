@@ -1,4 +1,3 @@
-// src/components/BookingModal.tsx
 import React, { useEffect, useRef, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import { FiX, FiCheck } from 'react-icons/fi'
@@ -89,29 +88,70 @@ export default function BookingModal({ open, onClose, lang = 'ru' }: Props) {
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-end md:items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative w-full max-w-4xl mx-4 bg-white dark:bg-[#061018] rounded-t-xl md:rounded-xl shadow-2xl overflow-hidden">
-        <div className="p-4 border-b flex items-center justify-between">
-          <h3 className="text-lg font-semibold">{L.title}</h3>
-          <button onClick={onClose} aria-label="Close" className="p-2 rounded hover:bg-gray-100 dark:hover:bg-[#0b1116]"><FiX /></button>
+    <div className="fixed inset-0 z-[9999] flex items-end md:items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
+      <div className="relative w-full max-w-2xl bg-white dark:bg-[#061018] rounded-xl shadow-lg overflow-hidden mx-auto my-4 outline-none focus:outline-none">
+        {/* Заголовок и кнопка закрытия */}
+        <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-xl font-semibold">{L.title}</h3>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="p-2 rounded hover:bg-gray-100 dark:hover:bg-[#0b1116] transition"
+          >
+            <FiX size={20} />
+          </button>
         </div>
 
-        <form ref={formRef} onSubmit={(e)=>{ e.preventDefault(); handleSubmit() }} className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-2 space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <input value={name} onChange={(e)=>setName(e.target.value)} placeholder={L.name} className="p-3 rounded border w-full" required />
-              <input value={phone} onChange={(e)=>setPhone(e.target.value)} placeholder={L.phone} className="p-3 rounded border w-full" required />
+        {/* Основная форма */}
+        <form
+          ref={formRef}
+          onSubmit={(e) => { e.preventDefault(); handleSubmit() }}
+          className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4"
+        >
+          {/* Основная часть формы */}
+          <div className="md:col-span-2 space-y-4">
+            {/* Имя и телефон */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={L.name}
+                className="p-3 rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                required
+              />
+              <input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder={L.phone}
+                className="p-3 rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                required
+              />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <input value={from} onChange={(e)=>setFrom(e.target.value)} placeholder={L.from} className="p-3 rounded border w-full" required />
-              <input value={to} onChange={(e)=>setTo(e.target.value)} placeholder={L.to} className="p-3 rounded border w-full" required />
+            {/* Откуда и Куда */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+                placeholder={L.from}
+                className="p-3 rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                required
+              />
+              <input
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+                placeholder={L.to}
+                className="p-3 rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                required
+              />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 items-end">
-              <div>
-                <label className="text-xs text-gray-500 block mb-1">{L.date} & {L.time}</label>
+            {/* Дата, время и авто */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+              {/* Дата и время */}
+              <div className="flex-1">
+                <label className="block mb-1 text-xs text-gray-500">{L.date} & {L.time}</label>
                 <DatePicker
                   selected={datetime}
                   onChange={(d) => setDatetime(d)}
@@ -119,68 +159,121 @@ export default function BookingModal({ open, onClose, lang = 'ru' }: Props) {
                   timeFormat="HH:mm"
                   timeIntervals={15}
                   dateFormat="Pp"
-                  className="w-full p-3 rounded border"
                   placeholderText={isEn ? 'Select date and time' : 'Выберите дату и время'}
+                  className="w-full p-3 rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
                   required
                 />
               </div>
 
-              <div>
-                <label className="text-xs text-gray-500 block mb-1">{L.car}</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {/* Выбор авто */}
+              <div className="flex-1 md:col-span-2">
+                <label className="block mb-1 text-xs text-gray-500">{L.car}</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-700">
                   {CARS.map(c => (
-                    <button key={c.id} type="button" onClick={()=>setSelectedCar(c)} className={`p-3 rounded border text-left ${selectedCar.id===c.id ? 'border-indigo-500 bg-indigo-50' : ''}`}>
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setSelectedCar(c)}
+                      className={`p-3 rounded border cursor-pointer transition duration-200 ${
+                        selectedCar.id === c.id
+                          ? 'border-indigo-500 bg-indigo-50'
+                          : 'border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                    >
                       <div className="font-medium">{c.title}</div>
-                      <div className="text-xs text-gray-500">{c.subtitle}</div>
+                      {c.subtitle && <div className="text-xs text-gray-500">{c.subtitle}</div>}
                     </button>
                   ))}
                 </div>
               </div>
             </div>
 
-            <textarea value={notes} onChange={(e)=>setNotes(e.target.value)} placeholder={L.notes} className="p-3 rounded border w-full" rows={3} />
+            {/* Примечания */}
+            <div>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder={L.notes}
+                className="w-full p-3 rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                rows={3}
+              />
+            </div>
 
-            <div className="flex items-center gap-4">
+            {/* Подтверждение и способ связи */}
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-4 mb-4">
+              {/* Согласие */}
               <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" checked={agree} onChange={(e)=>setAgree(e.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={agree}
+                  onChange={(e) => setAgree(e.target.checked)}
+                  className="accent-indigo-500"
+                />
                 <span>{L.agreeText}</span>
               </label>
 
+              {/* Предпочтительный способ связи */}
               <div className="ml-auto flex items-center gap-2">
-                <label className="text-sm text-gray-500 mr-2">{L.preferContact}:</label>
-                <select value={contactMethod} onChange={(e)=>setContactMethod(e.target.value as any)} className="p-2 rounded border">
+                <label className="text-sm text-gray-500">{L.preferContact}:</label>
+                <select
+                  value={contactMethod}
+                  onChange={(e) => setContactMethod(e.target.value as 'phone' | 'email')}
+                  className="p-2 rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                >
                   <option value="phone">{isEn ? 'Phone' : 'Телефон'}</option>
-                  <option value="email">Email</option>
+                  <option value="email">{isEn ? 'Email' : 'Эл. почта'}</option>
                 </select>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <button type="submit" disabled={loading || !agree} className="px-4 py-2 rounded bg-indigo-600 text-white">
-                {loading ? (isEn ? 'Sending…' : 'Отправка…') : (isEn ? L.submit : L.submit)}
+            {/* Кнопки отправки */}
+            <div className="flex flex-col md:flex-row items-center gap-3">
+              <button
+                type="submit"
+                disabled={loading || !agree}
+                className={`w-full md:w-auto px-4 py-2 rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition`}
+              >
+                {loading ? (
+                  <div className="border-2 border-white border-t-transparent w-5 h-5 rounded-full animate-spin mr-2" />
+                ) : (
+                  L.submit
+                )}
               </button>
-              <button type="button" onClick={onClose} className="px-4 py-2 rounded border">{isEn ? 'Close' : 'Закрыть'}</button>
-              {success && <div className="text-sm text-green-600 flex items-center gap-2"><FiCheck /> {L.success}</div>}
-              {error && <div className="text-sm text-red-600">{error}</div>}
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-full md:w-auto px-4 py-2 rounded-md border border-gray-400 hover:bg-gray-100 transition"
+              >
+                {isEn ? 'Close' : 'Закрыть'}
+              </button>
+            </div>
+            {/* Уведомления */}
+            <div className="mt-2 flex flex-col space-y-2">
+              {success && (
+                <div className="flex items-center text-green-600 text-sm gap-2">
+                  <FiCheck />
+                  {L.success}
+                </div>
+              )}
+              {error && <div className="text-red-600 text-sm">{error}</div>}
             </div>
           </div>
 
-          <aside className="md:col-span-1 bg-gray-50 dark:bg-[#071217] p-4 rounded-lg flex flex-col gap-4">
+          {/* Боковая панель с информацией */}
+          <aside className="md:col-span-1 bg-gray-50 dark:bg-[#071217] p-4 rounded-lg flex flex-col gap-4 max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-700">
             <div>
               <div className="text-xs text-gray-500 mb-1">{selectedCar.subtitle}</div>
-              <div className="font-semibold">{selectedCar.title}</div>
+              <div className="font-semibold text-lg">{selectedCar.title}</div>
             </div>
-
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 flex flex-col gap-2">
               <div>• {isEn ? 'Meet & greet' : 'Встреча с табличкой'}</div>
               <div>• {isEn ? 'Luggage assistance' : 'Помощь с багажом'}</div>
               <div>• {isEn ? 'Waiting included' : 'Время ожидания включено'}</div>
             </div>
-
-            <div className="mt-auto text-xs text-gray-500"> {isEn ? 'Price available on request' : 'Цена по запросу'} </div>
+            <div className="mt-auto text-xs text-gray-500">{isEn ? 'Price available on request' : 'Цена по запросу'}</div>
           </aside>
         </form>
       </div>
     </div>
   )
-                                                           }
+}
