@@ -17,7 +17,9 @@
     "tailwindcss": "3.4.1",
     "react-icons": "^4.11.0",
     "nodemailer": "^6.9.4",
-    "cross-fetch": "^3.1.5"
+    "cross-fetch": "^3.1.5",
+    "react-datepicker": "^4.16.0",
+    "date-fns": "^2.30.0"
   },
   "devDependencies": {
     "eslint": "8.56.0",
@@ -25,6 +27,7 @@
     "typescript": "^5.3.3",
     "@types/react": "^18.2.45",
     "@types/node": "^20.10.6",
-    "@types/nodemailer": "^6.4.7"
+    "@types/nodemailer": "^6.4.7",
+    "@types/react-datepicker": "^4.8.4"
   }
 }
