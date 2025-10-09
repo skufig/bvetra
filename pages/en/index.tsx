@@ -16,7 +16,8 @@ export default function HomeEn() {
         <meta name="description" content="Corporate transfers and car rental for businesses" />
       </Head>
 
-      <Header onOpenModal={() => setOpen(true)} isEn />
+      <Header onOpenModal={() => setOpen(true)} />
+
 
       <main className="mx-auto max-w-6xl px-4 py-8">
         <section className="pt-6 pb-12">
