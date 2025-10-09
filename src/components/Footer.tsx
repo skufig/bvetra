@@ -10,7 +10,7 @@ import BottomNav from './BottomNav';
 
 // Константы для повторно используемых данных
 const CONTACT_INFO = {
-  phone: '+375291234567',
+  phone: '+375291414555',
   email: 'support@bvetra.example',
   workHours: '08:00 — 22:00',
   address: 'г. Москва'
