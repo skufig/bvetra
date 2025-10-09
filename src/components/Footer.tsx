@@ -1,6 +1,5 @@
-// components/Footer.tsx
 import React, { useState } from 'react'
-import { FiInstagram, FiMail, FiPhone, FiClock, FiChevronUp } from 'react-icons/fi'
+import { FiInstagram, FiMail, FiPhone, FiClock } from 'react-icons/fi'
 import { FaTelegramPlane } from 'react-icons/fa'
 import BookingModal from './BookingModal'
 import ChatModal from './ChatModal'
@@ -62,7 +61,6 @@ export default function Footer({ isEn = false }: Props) {
     <>
       <footer className="mt-12 border-t bg-[color:var(--surface-1)] dark:bg-[color:var(--surface-2)] text-[color:var(--muted)]">
         <div className="mx-auto max-w-6xl px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Brand / Contact */}
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <div className="w-12 h-8 rounded flex items-center justify-center bg-[color:var(--primary)]/10 text-[color:var(--primary)] font-bold">Bv</div>
@@ -103,7 +101,6 @@ export default function Footer({ isEn = false }: Props) {
             </div>
           </div>
 
-          {/* Navigation */}
           <div>
             <h4 className="text-[color:var(--text)] font-semibold mb-3">{isEn ? 'Navigation' : 'Навигация'}</h4>
             <ul className="space-y-2 text-sm text-[color:var(--muted)]">
@@ -142,7 +139,6 @@ export default function Footer({ isEn = false }: Props) {
             </div>
           </div>
 
-          {/* Newsletter & legal */}
           <div className="md:col-span-2">
             <h4 className="text-[color:var(--text)] font-semibold mb-3">{isEn ? 'Subscribe & Legal' : 'Подписка и информация'}</h4>
 
@@ -174,11 +170,9 @@ export default function Footer({ isEn = false }: Props) {
         </div>
       </footer>
 
-      {/* Modals */}
       <BookingModal open={modalOpen} onClose={() => setModalOpen(false)} isEn={isEn} />
       <ChatModal open={chatOpen} onClose={() => setChatOpen(false)} isEn={isEn} />
 
-      {/* Bottom fixed nav for mobile */}
       <BottomNav
         onOpenBooking={() => setModalOpen(true)}
         onOpenChat={() => setChatOpen(true)}
