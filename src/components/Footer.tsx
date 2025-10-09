@@ -1,184 +1,88 @@
+// src/components/Footer.tsx
 import React, { useState } from 'react'
-import { FiInstagram, FiMail, FiPhone, FiClock } from 'react-icons/fi'
+import { FiPhone, FiMail, FiClock, FiInstagram } from 'react-icons/fi'
 import { FaTelegramPlane } from 'react-icons/fa'
 import BookingModal from './BookingModal'
 import ChatModal from './ChatModal'
+import ProfileModal from './ProfileModal'
 import BottomNav from './BottomNav'
 
-type Props = { isEn?: boolean }
+export default function Footer() {
+  const [lang, setLang] = useState<'ru'|'en'> ( (typeof window !== 'undefined' && (localStorage.getItem('lang') as 'ru'|'en')) || 'ru' )
+  const isEn = lang==='en'
+  const [openBooking, setOpenBooking] = useState(false)
+  const [openChat, setOpenChat] = useState(false)
+  const [openProfile, setOpenProfile] = useState(false)
 
-export default function Footer({ isEn = false }: Props) {
-  const [modalOpen, setModalOpen] = useState(false)
-  const [chatOpen, setChatOpen] = useState(false)
-  const [email, setEmail] = useState('')
-  const [subscribed, setSubscribed] = useState(false)
-
-  const L = isEn
-    ? {
-        brand: 'Bvetra',
-        subtitle: 'Corporate transfers',
-        phone: '+375291234567',
-        email: 'support@bvetra.example',
-        appStore: 'App Store',
-        googlePlay: 'Google Play',
-        subscribe: 'Subscribe',
-        thanks: 'Thanks',
-        home: 'Home',
-        booking: 'Booking',
-        chat: 'Chat',
-        profile: 'Profile',
-      }
-    : {
-        brand: 'Bvetra',
-        subtitle: 'Корпоративные трансферы',
-        phone: '+375291234567',
-        email: 'support@bvetra.example',
-        appStore: 'App Store',
-        googlePlay: 'Google Play',
-        subscribe: 'Подписаться',
-        thanks: 'Спасибо',
-        home: 'Главная',
-        booking: 'Бронь',
-        chat: 'Чат',
-        profile: 'Профиль',
-      }
-
-  function handleCall() {
-    if (typeof window !== 'undefined') window.location.href = `tel:${L.phone}`
-  }
-  function handleEmail() {
-    if (typeof window !== 'undefined') window.location.href = `mailto:${L.email}`
-  }
-
-  function submitNewsletter(e: React.FormEvent) {
-    e.preventDefault()
-    if (!email) return
-    setSubscribed(true)
-    window.dispatchEvent(new CustomEvent('analytics', { detail: { action: 'subscribe_newsletter', email } }))
+  function switchLang(to:'ru'|'en') {
+    setLang(to); try{ localStorage.setItem('lang', to) }catch{}
   }
 
   return (
     <>
-      <footer className="mt-12 border-t bg-[color:var(--surface-1)] dark:bg-[color:var(--surface-2)] text-[color:var(--muted)]">
-        <div className="mx-auto max-w-6xl px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="space-y-3">
+      <footer className="bg-white dark:bg-[#050607] border-t">
+        <div className="mx-auto max-w-6xl px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-8 rounded flex items-center justify-center bg-[color:var(--primary)]/10 text-[color:var(--primary)] font-bold">Bv</div>
+              <div className="w-12 h-8 rounded flex items-center justify-center bg-indigo-50 text-indigo-600 font-bold">Bv</div>
               <div>
-                <div className="text-[color:var(--text)] font-semibold">{L.brand}</div>
-                <div className="text-sm text-[color:var(--muted)]">{L.subtitle}</div>
+                <div className="font-semibold">{isEn ? 'Bvetra' : 'Bvetra'}</div>
+                <div className="text-sm text-gray-500">{isEn ? 'Corporate transfers' : 'Корпоративные трансферы'}</div>
               </div>
             </div>
 
-            <div className="text-sm text-[color:var(--muted)] space-y-2">
-              <div className="flex items-center gap-2">
-                <FiPhone className="w-4 h-4" />
-                <button onClick={handleCall} className="text-[color:var(--text)] hover:underline" aria-label="Call">
-                  {L.phone}
-                </button>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <FiMail className="w-4 h-4" />
-                <button onClick={handleEmail} className="text-[color:var(--text)] hover:underline" aria-label="Email">
-                  {L.email}
-                </button>
-              </div>
-
-              <div className="flex items-center gap-2 text-xs text-[color:var(--muted)]">
-                <FiClock className="w-4 h-4" />
-                <div>08:00 — 22:00</div>
-              </div>
+            <div className="text-sm text-gray-600 space-y-2">
+              <div className="flex items-center gap-2"><FiPhone/> <a href="tel:+375291234567" className="hover:underline">+375 29 123-45-67</a></div>
+              <div className="flex items-center gap-2"><FiMail/> <a href="mailto:support@bvetra.example" className="hover:underline">support@bvetra.example</a></div>
+              <div className="flex items-center gap-2 text-xs"><FiClock/> 08:00 — 22:00</div>
             </div>
 
             <div className="flex items-center gap-3 mt-3">
-              <a href="https://instagram.com" aria-label="Instagram" target="_blank" rel="noreferrer" className="p-2 rounded hover:bg-[color:var(--primary)]/12">
-                <FiInstagram />
-              </a>
-              <a href="https://t.me" aria-label="Telegram" target="_blank" rel="noreferrer" className="p-2 rounded hover:bg-[color:var(--primary)]/12">
-                <FaTelegramPlane />
-              </a>
+              <a className="p-2 rounded hover:bg-gray-100"><FiInstagram/></a>
+              <a className="p-2 rounded hover:bg-gray-100"><FaTelegramPlane/></a>
             </div>
           </div>
 
           <div>
-            <h4 className="text-[color:var(--text)] font-semibold mb-3">{isEn ? 'Navigation' : 'Навигация'}</h4>
-            <ul className="space-y-2 text-sm text-[color:var(--muted)]">
-              <li>
-                <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:underline">
-                  {L.home}
-                </button>
-              </li>
-              <li>
-                <button onClick={() => setModalOpen(true)} className="hover:underline">
-                  {L.booking}
-                </button>
-              </li>
-              <li>
-                <button onClick={() => setChatOpen(true)} className="hover:underline">
-                  {L.chat}
-                </button>
-              </li>
-              <li>
-                <button onClick={() => alert(isEn ? 'Profile (in progress)' : 'Профиль (в разработке)')} className="hover:underline">
-                  {L.profile}
-                </button>
-              </li>
+            <h4 className="font-semibold mb-3">{isEn ? 'Navigation' : 'Навигация'}</h4>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li><button onClick={()=>window.scrollTo({top:0,behavior:'smooth'})} className="hover:underline">{isEn ? 'Home' : 'Главная'}</button></li>
+              <li><button onClick={()=>setOpenBooking(true)} className="hover:underline">{isEn ? 'Booking' : 'Бронь'}</button></li>
+              <li><button onClick={()=>setOpenChat(true)} className="hover:underline">{isEn ? 'Chat' : 'Чат'}</button></li>
+              <li><button onClick={()=>setOpenProfile(true)} className="hover:underline">{isEn ? 'Profile' : 'Профиль'}</button></li>
             </ul>
 
-            <div className="mt-4">
-              <h5 className="text-[color:var(--text)] font-medium mb-2">{isEn ? 'Mobile app' : 'Мобильное приложение'}</h5>
-              <div className="flex gap-2">
-                <a href="#" aria-label="App Store" className="inline-flex items-center gap-2 rounded-lg px-3 py-2 bg-[color:var(--surface-1)] border hover:border-[color:var(--primary)]/18 text-xs">
-                  {L.appStore}
-                </a>
-                <a href="#" aria-label="Google Play" className="inline-flex items-center gap-2 rounded-lg px-3 py-2 bg-[color:var(--surface-1)] border hover:border-[color:var(--primary)]/18 text-xs">
-                  {L.googlePlay}
-                </a>
-              </div>
+            <div className="mt-4 flex gap-2">
+              <button onClick={()=>switchLang('ru')} className={`px-3 py-1 rounded ${lang==='ru' ? 'bg-indigo-600 text-white' : 'border'}`}>RU</button>
+              <button onClick={()=>switchLang('en')} className={`px-3 py-1 rounded ${lang==='en' ? 'bg-indigo-600 text-white' : 'border'}`}>EN</button>
             </div>
           </div>
 
-          <div className="md:col-span-2">
-            <h4 className="text-[color:var(--text)] font-semibold mb-3">{isEn ? 'Subscribe & Legal' : 'Подписка и информация'}</h4>
-
-            <form onSubmit={submitNewsletter} className="flex gap-3 items-start sm:items-center">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={isEn ? 'Your email' : 'Ваш e-mail'}
-                className="px-4 py-2 rounded-lg border w-full sm:w-auto sm:flex-1 bg-[color:var(--bg)] text-[color:var(--text)]"
-                required
-              />
-              <button type="submit" className="inline-flex items-center gap-2 px-4 py-2 rounded-full btn-primary btn-lift">
-                {subscribed ? (isEn ? 'Thanks' : 'Спасибо') : (isEn ? 'Subscribe' : 'Подписаться')}
-              </button>
-            </form>
-
-            <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-[color:var(--muted)]">
-              <button className="hover:underline"> {isEn ? 'Terms' : 'Условия'} </button>
-              <button className="hover:underline"> {isEn ? 'Privacy' : 'Политика'} </button>
-              <button className="hover:underline"> {isEn ? 'FAQ' : 'Вопросы'} </button>
-              <button className="hover:underline"> {isEn ? 'Support' : 'Поддержка'} </button>
+          <div>
+            <h4 className="font-semibold mb-3">{isEn ? 'App' : 'Приложение'}</h4>
+            <div className="flex flex-col gap-3">
+              <button className="px-4 py-2 rounded border text-sm">App Store</button>
+              <button className="px-4 py-2 rounded border text-sm">Google Play</button>
             </div>
+          </div>
 
-            <div className="mt-6 text-xs text-[color:var(--muted)]">
-              © {new Date().getFullYear()} {L.brand} — {isEn ? 'All rights reserved.' : 'корпоративные трансферы. Все права защищены.'}
+          <div>
+            <h4 className="font-semibold mb-3">{isEn ? 'Support' : 'Поддержка'}</h4>
+            <div className="text-sm text-gray-600 space-y-2">
+              <div>FAQ</div>
+              <div>Terms</div>
+              <div>Privacy</div>
             </div>
+            <div className="mt-6 text-xs text-gray-500">© {new Date().getFullYear()} Bvetra</div>
           </div>
         </div>
       </footer>
 
-      <BookingModal open={modalOpen} onClose={() => setModalOpen(false)} isEn={isEn} />
-      <ChatModal open={chatOpen} onClose={() => setChatOpen(false)} isEn={isEn} />
+      <BookingModal open={openBooking} onClose={()=>setOpenBooking(false)} lang={lang} />
+      <ChatModal open={openChat} onClose={()=>setOpenChat(false)} lang={lang} />
+      <ProfileModal open={openProfile} onClose={()=>setOpenProfile(false)} />
 
-      <BottomNav
-        onOpenBooking={() => setModalOpen(true)}
-        onOpenChat={() => setChatOpen(true)}
-        phone={L.phone}
-        isEn={isEn}
-      />
+      <BottomNav onOpenBooking={()=>setOpenBooking(true)} onOpenChat={()=>setOpenChat(true)} phone="+375291234567" />
     </>
   )
 }
