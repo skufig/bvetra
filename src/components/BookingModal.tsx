@@ -1,5 +1,4 @@
-// components/BookingModal.tsx
-export default function BookingModal() { return null }
+// src/components/BookingModal.tsx
 import React, { useEffect, useState } from 'react'
 import { FiX, FiCheck } from 'react-icons/fi'
 
@@ -43,7 +42,6 @@ export default function BookingModal({ open, onClose, isEn = false }: Props) {
 
   useEffect(() => {
     if (!open) {
-      // reset
       setName(''); setPhone(''); setEmail(''); setFrom(''); setTo(''); setDate(''); setTime(''); setNotes(''); setAgree(false)
       setLoading(false); setSuccess(false); setError(null)
     }
@@ -68,7 +66,6 @@ export default function BookingModal({ open, onClose, isEn = false }: Props) {
       if (!res.ok || !json.ok) throw new Error(json.message || 'Network error')
       setSuccess(true)
       window.dispatchEvent(new CustomEvent('analytics', { detail: { action: 'booking_submitted', payload } }))
-      // keep modal open to show success; auto-close after short delay
       setTimeout(() => { setLoading(false); onClose() }, 1600)
     } catch (err: any) {
       setError(err.message || 'Error')
