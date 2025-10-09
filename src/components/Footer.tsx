@@ -222,7 +222,8 @@ export default function Footer({ langProp }: { langProp?: 'ru' | 'en' }) {
       </footer>
 
       <BookingModal open={openBooking} onClose={() => setOpenBooking(false)} lang={lang} />
-      <ChatModal open={openChat} onClose={() => setOpenChat(false)} lang={lang} />
+      <ChatModal open={openChat} onClose={() => setOpenChat(false)} />
+
       <ProfileModal open={openProfile} onClose={() => setOpenProfile(false)} />
 
       <BottomNav 
