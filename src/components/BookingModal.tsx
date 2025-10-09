@@ -88,9 +88,12 @@ export default function BookingModal({ open, onClose, lang = 'ru' }: Props) {
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-end md:items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
-      <div className="relative w-full max-w-2xl bg-white dark:bg-[#061018] rounded-xl shadow-lg overflow-hidden mx-auto my-4 outline-none focus:outline-none">
+    <div className="fixed inset-0 z-[9999] flex items-start md:items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
+      {/* Фон для закрытия */}
+      <div className="absolute inset-0 cursor-pointer" onClick={onClose} aria-hidden="true" />
+      
+      {/* Модальное окно */}
+      <div className="relative w-full max-w-xl md:max-w-3xl bg-white dark:bg-[#061018] rounded-xl shadow-lg z-10 mx-auto my-4 outline-none focus:outline-none overflow-hidden">
         {/* Заголовок и кнопка закрытия */}
         <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-xl font-semibold">{L.title}</h3>
@@ -105,12 +108,11 @@ export default function BookingModal({ open, onClose, lang = 'ru' }: Props) {
 
         {/* Основная форма */}
         <form
-          ref={formRef}
           onSubmit={(e) => { e.preventDefault(); handleSubmit() }}
-          className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4"
+          className="p-4 flex flex-col md:flex-row gap-4"
         >
           {/* Основная часть формы */}
-          <div className="md:col-span-2 space-y-4">
+          <div className="flex-1 w-full flex flex-col gap-4">
             {/* Имя и телефон */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <input
@@ -168,7 +170,7 @@ export default function BookingModal({ open, onClose, lang = 'ru' }: Props) {
               {/* Выбор авто */}
               <div className="flex-1 md:col-span-2">
                 <label className="block mb-1 text-xs text-gray-500">{L.car}</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-700">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-700 rounded">
                   {CARS.map(c => (
                     <button
                       key={c.id}
