@@ -33,6 +33,14 @@ module.exports = {
           '50%': { transform: 'translateY(-6px)' },
           '100%': { transform: 'translateY(0)' }
         },
+        slideInRight: {
+          '0%': { transform: 'translateX(100%)', opacity: 0 },
+          '100%': { transform: 'translateX(0)', opacity: 1 }
+        },
+        slideOutRight: {
+          '0%': { transform: 'translateX(0)', opacity: 1 },
+          '100%': { transform: 'translateX(100%)', opacity: 0 }
+        },
         fadeInUp: {
           '0%': { opacity: 0, transform: 'translateY(6px)' },
           '100%': { opacity: 1, transform: 'translateY(0)' }
@@ -40,6 +48,8 @@ module.exports = {
       },
       animation: {
         float: 'float 4s ease-in-out infinite',
+        slideInRight: 'slideInRight 320ms cubic-bezier(.2,.9,.3,1) both',
+        slideOutRight: 'slideOutRight 240ms cubic-bezier(.4,.0,.2,1) both',
         fadeInUp: 'fadeInUp 420ms ease both'
       }
     },
