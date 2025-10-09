@@ -2,31 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design tokens */
+/* Design tokens: light and black-gold dark theme */
 :root {
   --bg: #ffffff;
   --surface-1: #fbf8f4;
   --surface-2: #f5efe6;
   --text: #1f1f1f;
   --muted: #6b6b6b;
-  --primary: #cbb88f; /* gold-400 */
+  --primary: #cbb88f; /* light gold */
   --primary-600: #a6874f;
+  --accent-shimmer: linear-gradient(90deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.32) 50%, rgba(255,255,255,0.15) 100%);
   --glass: rgba(255,255,255,0.64);
   --shadow: 0 10px 30px rgba(2,6,23,0.06);
   --radius: 12px;
 }
 
-/* Dark theme: deep coffee */
+/* Dark: Black Gold palette (чёрное золото) */
 html.dark {
-  --bg: #070605;
-  --surface-1: #0b0a09;
-  --surface-2: #131110;
-  --text: #e9e2db;
-  --muted: #b8a99b;
-  --primary: #6b4a36; /* coffee accent */
-  --primary-600: #5a3f2f;
-  --glass: rgba(10,8,6,0.64);
-  --shadow: 0 12px 34px rgba(0,0,0,0.6);
+  --bg: #050404;                 /* near black */
+  --surface-1: #090808;          /* deep card */
+  --surface-2: #0f0e0e;          /* panels */
+  --text: #efe7dc;               /* warm off-white */
+  --muted: #c9b8a6;              /* warm muted */
+  --primary: #b88a3a;            /* gold on black */
+  --primary-600: #8f6a2a;
+  --accent-shimmer: linear-gradient(90deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.14) 50%, rgba(255,255,255,0.06) 100%);
+  --glass: rgba(8,6,4,0.72);
+  --shadow: 0 12px 40px rgba(0,0,0,0.7);
 }
 
 /* Base */
@@ -40,48 +42,51 @@ html, body {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-/* Buttons and components */
-.btn {
-  @apply inline-flex items-center justify-center rounded-full px-4 py-2.5 font-semibold transition;
-  border: 0;
-}
+/* Buttons */
+.btn { @apply inline-flex items-center justify-center rounded-full px-4 py-2.5 font-semibold transition; border: 0; }
 .btn-primary {
   background: linear-gradient(180deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 82%, black 18%) 100%);
-  color: var(--text);
+  color: var(--bg);
   box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
 }
-.btn-ghost {
-  background: transparent;
-  border: 1px solid rgba(0,0,0,0.06);
-  color: var(--text);
+.btn-primary .shimmer {
+  position: absolute;
+  inset: 0;
+  background: var(--accent-shimmer);
+  transform: translateX(-120%);
+  transition: transform 900ms cubic-bezier(.2,.9,.3,1);
+  pointer-events: none;
 }
+.btn-primary:hover .shimmer { transform: translateX(120%); }
+
+/* CTA microinteraction */
+.btn-lift { transition: transform 180ms cubic-bezier(.2,.9,.3,1), box-shadow 180ms; }
+.btn-lift:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(2,6,23,0.16); }
 
 /* Header glass */
 .header-glass {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  background: linear-gradient(180deg, rgba(255,255,255,0.66), rgba(255,255,255,0.3));
+  background: linear-gradient(180deg, rgba(255,255,255,0.66), rgba(255,255,255,0.28));
 }
 html.dark .header-glass {
-  background: linear-gradient(180deg, rgba(10,8,6,0.78), rgba(10,8,6,0.4));
+  background: linear-gradient(180deg, rgba(8,6,4,0.86), rgba(8,6,4,0.44));
 }
 
-/* Mobile drawer + overlay */
+/* Drawer overlay and panel */
 .drawer-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(2,6,23,0.48);
+  background: rgba(2,6,23,0.5);
   z-index: 55;
   opacity: 0;
   pointer-events: none;
   transition: opacity 220ms ease;
 }
-.drawer-overlay.open {
-  opacity: 1;
-  pointer-events: auto;
-}
+.drawer-overlay.open { opacity: 1; pointer-events: auto; }
 
-/* Drawer panel */
 .mobile-drawer {
   position: fixed;
   top: 0;
@@ -109,25 +114,28 @@ html.dark .header-glass {
   animation: slideOutRight 240ms cubic-bezier(.4,.0,.2,1) both;
 }
 
-/* UI/UX microcopy and focus */
-a, button { transition: transform 160ms var(--soft), box-shadow 160ms var(--soft), opacity 160ms var(--soft); }
-a:hover, button:hover { transform: translateY(-2px); }
-a:focus, button:focus { outline: none; box-shadow: 0 0 0 4px rgba(0,0,0,0.06); }
+/* Motion keyframes */
+@keyframes slideInRight { 0%{ transform: translateX(100%); opacity:0 } 100%{ transform: translateX(0); opacity:1 } }
+@keyframes slideOutRight { 0%{ transform: translateX(0); opacity:1 } 100%{ transform: translateX(100%); opacity:0 } }
+@keyframes floatSubtle { 0%{transform:translateY(0)}50%{transform:translateY(-3px)}100%{transform:translateY(0)} }
+@keyframes motionDash { 0%{transform:translateX(0);opacity:1}80%{transform:translateX(36px);opacity:0}100%{transform:translateX(64px);opacity:0} }
 
-/* Typography refinement */
-h1 { font-size: 1.875rem; line-height: 1.1; margin: 0; }
-h2 { font-size: 1.25rem; line-height: 1.15; margin: 0; color: var(--text); }
+/* Typography refinements */
+h1 { font-size: 1.875rem; line-height: 1.08; margin: 0; letter-spacing: -0.02em; }
+h2 { font-size: 1.25rem; line-height: 1.15; margin: 0; }
 p, li { color: var(--muted); line-height: 1.6; }
 
-/* Depth helpers */
-.card {
-  background: var(--surface-1);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 1rem;
-}
+/* Cards and surfaces UX */
+.card { background: var(--surface-1); border-radius: 12px; padding: 1rem; box-shadow: var(--shadow); }
 
-/* Reduced motion */
+/* Scroll reveal helper - use with data-reveal attribute */
+[data-reveal] { opacity: 0; transform: translateY(10px); transition: opacity 520ms cubic-bezier(.2,.9,.3,1), transform 520ms cubic-bezier(.2,.9,.3,1); }
+[data-reveal].revealed { opacity: 1; transform: translateY(0); }
+
+/* Focus states */
+:focus { outline: none; box-shadow: 0 0 0 4px rgba(184,138,58,0.12); }
+
+/* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
@@ -136,7 +144,3 @@ p, li { color: var(--muted); line-height: 1.6; }
     scroll-behavior: auto !important;
   }
 }
-
-/* Small animation util */
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.motion-fadeInUp { animation: fadeInUp 420ms ease both; }
