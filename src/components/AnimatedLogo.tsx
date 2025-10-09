@@ -9,16 +9,18 @@ export default function SportsCarLogo({ className = '' }: { className?: string }
     const speedLines = speedLinesRef.current
     if (!svg || !speedLines) return
 
-    // Анимация линий скорости
+    // Анимация линий скорости с правильной типизацией
     const lines = speedLines.querySelectorAll('.speed-line')
     lines.forEach((line, index) => {
+      const svgLine = line as SVGPathElement
       const delay = index * 200
-      line.style.animation = `speedEffect 1.5s ease-in-out ${delay}ms infinite`
+      svgLine.style.animation = `speedEffect 1.5s ease-in-out ${delay}ms infinite`
     })
 
     return () => {
       lines.forEach(line => {
-        line.style.animation = ''
+        const svgLine = line as SVGPathElement
+        svgLine.style.animation = ''
       })
     }
   }, [])
