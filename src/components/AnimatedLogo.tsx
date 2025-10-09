@@ -1,87 +1,45 @@
 import React, { useEffect, useRef } from 'react'
 
-export default function AnimatedSportsCarLogo({ className = '' }: { className?: string }) {
+export default function SportsCarLogo({ className = '' }: { className?: string }) {
   const svgRef = useRef<SVGSVGElement | null>(null)
-  const carRef = useRef<SVGGElement | null>(null)
-  const pathRef = useRef<SVGPathElement | null>(null)
-  const rafRef = useRef<number | null>(null)
-  const startRef = useRef<number | null>(null)
-
-  const LOOP_DURATION = 4000
-  const REDUCED_MOTION = typeof window !== 'undefined' && window.matchMedia
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    : false
-
+  const speedLinesRef = useRef<SVGGElement | null>(null)
+  
   useEffect(() => {
-    if (REDUCED_MOTION) return
     const svg = svgRef.current
-    const car = carRef.current
-    const path = pathRef.current
-    if (!svg || !car || !path) return
+    const speedLines = speedLinesRef.current
+    if (!svg || !speedLines) return
 
-    const pathLen = path.getTotalLength()
-    
-    function easeOutCubic(t: number): number {
-      return 1 - Math.pow(1 - t, 3)
-    }
+    // Анимация линий скорости
+    const lines = speedLines.querySelectorAll('.speed-line')
+    lines.forEach((line, index) => {
+      const delay = index * 200
+      line.style.animation = `speedEffect 1.5s ease-in-out ${delay}ms infinite`
+    })
 
-    function step(ts: number) {
-      if (!startRef.current) startRef.current = ts
-      const elapsed = (ts - startRef.current) % LOOP_DURATION
-      const t = (elapsed / LOOP_DURATION) * 2
-      const segment = Math.floor(t) % 2
-      const progress = t % 1
-      
-      let easedProgress
-      if (segment === 0) {
-        // Первая половина пути - ускорение
-        easedProgress = easeOutCubic(progress)
-      } else {
-        // Вторая половина пути - замедление
-        easedProgress = 1 - easeOutCubic(1 - progress)
-      }
-      
-      const totalProgress = (segment + easedProgress) / 2
-      const dist = totalProgress * pathLen
-
-      const p = path.getPointAtLength(dist)
-      const lookAhead = Math.min(dist + 2, pathLen)
-      const next = path.getPointAtLength(lookAhead)
-      const angle = Math.atan2(next.y - p.y, next.x - p.x) * (180 / Math.PI)
-
-      car.setAttribute('transform', `translate(${p.x - 45}, ${p.y - 20}) rotate(${angle})`)
-
-      rafRef.current = window.requestAnimationFrame(step)
-    }
-
-    rafRef.current = window.requestAnimationFrame(step)
     return () => {
-      if (rafRef.current) window.cancelAnimationFrame(rafRef.current)
+      lines.forEach(line => {
+        line.style.animation = ''
+      })
     }
-  }, [REDUCED_MOTION])
+  }, [])
 
   return (
     <svg
       ref={svgRef}
-      viewBox="0 0 200 100"
+      viewBox="0 0 512 512"
       width="200"
-      height="100"
+      height="200"
       className={className}
       role="img"
-      aria-label="Sports car logo"
+      aria-label="Sports car with speed effect"
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
-        {/* Градиенты */}
-        <linearGradient id="carGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#ff6a00" />
-          <stop offset="50%" stopColor="#ff3d00" />
+        {/* Градиенты для машины */}
+        <linearGradient id="carBodyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#ff3d00" />
+          <stop offset="50%" stopColor="#de2a4e" />
           <stop offset="100%" stopColor="#ff1744" />
-        </linearGradient>
-
-        <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#00e5ff" />
-          <stop offset="100%" stopColor="#2979ff" />
         </linearGradient>
 
         <linearGradient id="wheelGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -89,183 +47,110 @@ export default function AnimatedSportsCarLogo({ className = '' }: { className?: 
           <stop offset="100%" stopColor="#102027" />
         </linearGradient>
 
-        <linearGradient id="glassGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#78909c" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#37474f" stopOpacity="0.8" />
+        <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#a3dddc" />
+          <stop offset="100%" stopColor="#78909c" />
         </linearGradient>
 
-        {/* Тени и эффекты */}
-        <filter id="carShadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="2" dy="4" stdDeviation="3" floodColor="#000000" floodOpacity="0.3" />
-        </filter>
-
+        {/* Фильтр для свечения */}
         <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur" />
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
           <feMerge>
             <feMergeNode in="blur"/>
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
-
-        {/* Траектория движения */}
-        <path
-          id="motionPath"
-          ref={pathRef as any}
-          d="M 20,50 C 40,20 160,20 180,50 C 200,80 40,80 20,50 Z"
-          fill="none"
-          stroke="none"
-        />
       </defs>
 
-      {/* Фоновая траектория */}
-      <path
-        d="M 20,50 C 40,20 160,20 180,50 C 200,80 40,80 20,50 Z"
-        fill="none"
-        stroke="url(#accentGradient)"
-        strokeWidth="1.5"
-        strokeDasharray="4 3"
-        opacity="0.3"
-      />
-
-      {/* Машина */}
-      <g ref={carRef as any} filter="url(#carShadow)">
-        {/* Основной кузов */}
-        <path
-          d="M 10,30 L 15,25 L 25,20 L 75,20 L 85,25 L 90,30 L 92,35 L 92,40 L 90,45 L 85,50 L 75,55 L 25,55 L 15,50 L 10,45 L 8,40 L 8,35 Z"
-          fill="url(#carGradient)"
-          stroke="#000"
-          strokeWidth="0.5"
+      {/* Линии скорости */}
+      <g ref={speedLinesRef} className="speed-lines">
+        <path 
+          className="speed-line"
+          d="M 50,350 L 120,350"
+          stroke="url(#carBodyGradient)"
+          strokeWidth="3"
+          strokeLinecap="round"
+          opacity="0"
         />
-
-        {/* Лобовое стекло */}
-        <path
-          d="M 25,25 L 35,22 L 65,22 L 75,25 L 75,35 L 65,32 L 35,32 Z"
-          fill="url(#glassGradient)"
-          stroke="#000"
-          strokeWidth="0.3"
+        <path 
+          className="speed-line"
+          d="M 40,370 L 110,370"
+          stroke="url(#carBodyGradient)"
+          strokeWidth="2"
+          strokeLinecap="round"
+          opacity="0"
         />
-
-        {/* Заднее стекло */}
-        <path
-          d="M 15,35 L 25,32 L 25,42 L 15,45 Z"
-          fill="url(#glassGradient)"
-          stroke="#000"
-          strokeWidth="0.3"
+        <path 
+          className="speed-line"
+          d="M 60,330 L 130,330"
+          stroke="url(#carBodyGradient)"
+          strokeWidth="4"
+          strokeLinecap="round"
+          opacity="0"
         />
-
-        {/* Боковая полоса */}
-        <path
-          d="M 20,35 L 80,35 L 80,45 L 20,45 Z"
-          fill="url(#accentGradient)"
-          stroke="#000"
-          strokeWidth="0.3"
-          opacity="0.9"
+        <path 
+          className="speed-line"
+          d="M 450,350 L 380,350"
+          stroke="url(#carBodyGradient)"
+          strokeWidth="3"
+          strokeLinecap="round"
+          opacity="0"
         />
-
-        {/* Передний бампер */}
-        <path
-          d="M 85,28 L 90,30 L 90,40 L 85,42 L 80,40 L 80,30 Z"
-          fill="#263238"
-          stroke="#000"
-          strokeWidth="0.3"
+        <path 
+          className="speed-line"
+          d="M 460,370 L 390,370"
+          stroke="url(#carBodyGradient)"
+          strokeWidth="2"
+          strokeLinecap="round"
+          opacity="0"
         />
-
-        {/* Задний бампер */}
-        <path
-          d="M 10,32 L 15,30 L 20,32 L 20,42 L 15,44 L 10,42 Z"
-          fill="#263238"
-          stroke="#000"
-          strokeWidth="0.3"
-        />
-
-        {/* Передняя фара */}
-        <ellipse cx="87" cy="35" rx="3" ry="2" fill="#ffff00" filter="url(#glow)" />
-        
-        {/* Задняя фара */}
-        <ellipse cx="13" cy="35" rx="2" ry="1.5" fill="#ff3d00" filter="url(#glow)" />
-
-        {/* Колеса */}
-        <g>
-          {/* Переднее колесо */}
-          <g transform="translate(25, 55)">
-            <circle cx="0" cy="0" r="8" fill="url(#wheelGradient)" stroke="#000" strokeWidth="0.5" />
-            <circle cx="0" cy="0" r="4" fill="#455a64" stroke="#000" strokeWidth="0.3" />
-            <circle cx="0" cy="0" r="1.5" fill="#cfd8dc" />
-            {/* Спицы */}
-            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
-              <line
-                key={angle}
-                x1="0"
-                y1="0"
-                x2={Math.cos(angle * Math.PI / 180) * 6}
-                y2={Math.sin(angle * Math.PI / 180) * 6}
-                stroke="#78909c"
-                strokeWidth="0.8"
-              />
-            ))}
-          </g>
-
-          {/* Заднее колесо */}
-          <g transform="translate(75, 55)">
-            <circle cx="0" cy="0" r="8" fill="url(#wheelGradient)" stroke="#000" strokeWidth="0.5" />
-            <circle cx="0" cy="0" r="4" fill="#455a64" stroke="#000" strokeWidth="0.3" />
-            <circle cx="0" cy="0" r="1.5" fill="#cfd8dc" />
-            {/* Спицы */}
-            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
-              <line
-                key={angle}
-                x1="0"
-                y1="0"
-                x2={Math.cos(angle * Math.PI / 180) * 6}
-                y2={Math.sin(angle * Math.PI / 180) * 6}
-                stroke="#78909c"
-                strokeWidth="0.8"
-              />
-            ))}
-          </g>
-        </g>
-
-        {/* Вентиляционные решетки */}
-        <g opacity="0.7">
-          <rect x="40" y="32" width="15" height="3" rx="1" fill="#37474f" />
-          <rect x="45" y="37" width="10" height="2" rx="1" fill="#37474f" />
-        </g>
-
-        {/* Спойлер */}
-        <path
-          d="M 70,18 L 80,15 L 82,18 L 70,20 Z"
-          fill="#d32f2f"
-          stroke="#000"
-          strokeWidth="0.3"
+        <path 
+          className="speed-line"
+          d="M 440,330 L 370,330"
+          stroke="url(#carBodyGradient)"
+          strokeWidth="4"
+          strokeLinecap="round"
+          opacity="0"
         />
       </g>
 
-      {/* Анимационные элементы */}
-      {!REDUCED_MOTION && (
-        <>
-          {/* Эффект скорости */}
-          <g opacity="0.6">
-            <animate 
-              attributeName="opacity"
-              values="0.2;0.8;0.2"
-              dur="1.5s"
-              repeatCount="indefinite"
-            />
-            <path
-              d="M 5,45 L 15,40"
-              stroke="url(#accentGradient)"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <path
-              d="M 5,50 L 12,48"
-              stroke="url(#accentGradient)"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          </g>
-        </>
-      )}
+      {/* Основной кузов машины */}
+      <path
+        d="M16.946,292.039L16.946,292.039c13.616,9.484,29.81,14.568,46.404,14.568h380.742 c8.288,0,16.563-0.667,24.744-1.994l27.398-4.443c4.513-0.732,7.83-4.63,7.83-9.202v-17.949c0-5.445-2.893-10.481-7.599-13.223 l-15.43-8.993c-28.237-16.456-60.333-25.127-93.014-25.127H287.016h-93.295c-4.989,0-9.951-0.726-14.731-2.154l-27.863-8.326 c-16.045-4.795-33.176-4.553-49.08,0.692l0,0c-5.51,1.817-11.275,2.743-17.077,2.743H46.254c-26.36,0-37.948,21.981-37.948,40.069 l-0.363,15.595C7.779,281.344,11.16,288.008,16.946,292.039z"
+        fill="url(#carBodyGradient)"
+        filter="url(#glow)"
+      />
+
+      {/* Акцентные детали */}
+      <path
+        d="M328.089,228.784c-6.84-7.89-70.373-41.549-92.537-47.828c-2.036-0.577-4.05,0.97-4.05,3.086v12.601 c0,1.311,0.799,2.488,2.017,2.972c9.093,3.617,46.207,18.808,55.026,29.169L328.089,228.784L328.089,228.784z"
+        fill="url(#accentGradient)"
+      />
+
+      <path
+        d="M281.74,234.421l-27.632,1.733c-3.178,0.199-5.924-2.194-6.163-5.368l-0.721-9.596 c-0.299-3.989,3.424-7.082,7.291-6.055l27.865,7.4c1.849,0.491,3.183,2.098,3.326,4.005l0.23,3.061 C286.124,232.097,284.237,234.264,281.74,234.421z"
+        fill="url(#accentGradient)"
+      />
+
+      {/* Колеса */}
+      <circle cx="95.873" cy="289.671" r="41.502" fill="url(#wheelGradient)"/>
+      <circle cx="95.873" cy="289.671" r="18.639" fill="#C7C9C9"/>
+      
+      <circle cx="406.21" cy="289.671" r="41.502" fill="url(#wheelGradient)"/>
+      <circle cx="406.21" cy="289.671" r="18.639" fill="#C7C9C9"/>
+
+      {/* Дополнительные детали */}
+      <path
+        d="M160.764,230.611l8.636-29.231c1.51-5.111,6.389-8.469,11.703-8.052l0,0 c5.871,0.46,10.401,5.359,10.401,11.249v24.386L160.764,230.611z"
+        fill="#272F37"
+      />
+
+      {/* Стеклянные элементы */}
+      <path
+        d="M481.037,250.804c-12.52-7.296-25.8-13.054-39.551-17.212l18.826,25.858 c2.66,3.655,7.44,5.074,11.663,3.463l18.04-6.877L481.037,250.804z"
+        fill="url(#accentGradient)"
+        opacity="0.8"
+      />
 
       <style jsx>{`
         svg {
@@ -274,18 +159,42 @@ export default function AnimatedSportsCarLogo({ className = '' }: { className?: 
           max-width: 100%;
           height: auto;
         }
-        
-        @media (prefers-reduced-motion: reduce) {
-          svg {
-            animation: none;
+
+        @keyframes speedEffect {
+          0% {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          50% {
+            opacity: 1;
+            transform: translateX(0);
+          }
+          100% {
+            opacity: 0;
+            transform: translateX(20px);
           }
         }
-        
-        @media (prefers-reduced-motion: no-preference) {
-          svg:hover {
-            transform: scale(1.02);
-            transition: transform 0.3s ease;
+
+        .speed-line {
+          animation: speedEffect 1.5s ease-in-out infinite;
+        }
+
+        .speed-line:nth-child(1) { animation-delay: 0ms; }
+        .speed-line:nth-child(2) { animation-delay: 200ms; }
+        .speed-line:nth-child(3) { animation-delay: 400ms; }
+        .speed-line:nth-child(4) { animation-delay: 100ms; }
+        .speed-line:nth-child(5) { animation-delay: 300ms; }
+        .speed-line:nth-child(6) { animation-delay: 500ms; }
+
+        @media (prefers-reduced-motion: reduce) {
+          .speed-line {
+            animation: none;
+            opacity: 0.3;
           }
+        }
+
+        svg:hover .speed-line {
+          animation-duration: 0.8s;
         }
       `}</style>
     </svg>
