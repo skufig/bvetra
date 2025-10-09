@@ -1,6 +1,8 @@
+// pages/_app.tsx (пример добавления Footer)
 import '../src/styles/globals.css'
 import type { AppProps } from 'next/app'
 import { useEffect } from 'react'
+import Footer from '../components/Footer'
 
 export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
@@ -11,5 +13,10 @@ export default function App({ Component, pageProps }: AppProps) {
     } catch {}
   }, [])
 
-  return <Component {...pageProps} />
+  return (
+    <>
+      <Component {...pageProps} />
+      <Footer />
+    </>
+  )
 }
