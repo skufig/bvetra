@@ -1,10 +1,14 @@
 import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
 import AnimatedLogo from './AnimatedLogo'
+import { useLanguage } from '../context/LanguageContext'
+import LanguageSwitcher from './LanguageSwitcher'
+import ThemeToggle from './ThemeToggle'
 
-type Props = { onOpenModal?: () => void; isEn?: boolean }
+export default function Header({ onOpenModal }: { onOpenModal?: () => void }) {
+  const { lang } = useLanguage()
+  const isEn = lang === 'en'
 
-export default function Header({ onOpenModal, isEn }: Props) {
   // Translations
   const t = {
     ru: {
@@ -205,7 +209,20 @@ export default function Header({ onOpenModal, isEn }: Props) {
             </button>
           </div>
         </div>
-      </header>
+      
+      <div className="md:hidden">
+        <button aria-label="Open menu" className="p-2 rounded-md" id="mobile-menu-toggle">☰</button>
+      </div>
+      <nav id="mobile-menu" className="hidden md:hidden">
+        <ul className="space-y-2 p-4">
+          <li><a href="#about" className="block">About</a></li>
+          <li><a href="#services" className="block">Services</a></li>
+          <li><a href="#fleet" className="block">Fleet</a></li>
+          <li><a href="#contact" className="block">Contact</a></li>
+        </ul>
+      </nav>
+
+</header>
 
       {/* Drawer overlay */}
       <div ref={overlayRef} className={`drawer-overlay ${mobileOpen ? 'open' : ''}`} onClick={closeDrawer} />
@@ -243,3 +260,19 @@ export default function Header({ onOpenModal, isEn }: Props) {
     </>
   )
 }
+
+{/* Mobile menu toggle script */}
+<script dangerouslySetInnerHTML={{__html: `
+  (function(){
+    try{
+      const btn = document.getElementById('mobile-menu-toggle')
+      const menu = document.getElementById('mobile-menu')
+      if(btn && menu){
+        btn.addEventListener('click', ()=> {
+          if(menu.classList.contains('hidden')) menu.classList.remove('hidden')
+          else menu.classList.add('hidden')
+        })
+      }
+    }catch(e){}
+  })();
+`}} />
