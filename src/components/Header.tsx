@@ -13,9 +13,9 @@ export default function Header({ onOpenModal, isEn }: Props) {
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
   })
   const [scrolled, setScrolled] = useState(false)
-  const [showTop, setShowTop] = useState(false)
   const langHref = isEn ? '/' : '/en'
-  const mobileRef = useRef<HTMLDivElement | null>(null)
+  const drawerRef = useRef<HTMLDivElement | null>(null)
+  const closeTimeoutRef = useRef<number | null>(null)
 
   useEffect(() => {
     if (dark) document.documentElement.classList.add('dark')
@@ -27,28 +27,50 @@ export default function Header({ onOpenModal, isEn }: Props) {
     function onScroll() {
       const y = window.scrollY
       setScrolled(y > 8)
-      setShowTop(y > 320)
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // close on outside click or Escape
   useEffect(() => {
     function handleOutside(e: MouseEvent) {
-      if (!mobileRef.current) return
-      if (mobileOpen && !mobileRef.current.contains(e.target as Node)) setMobileOpen(false)
+      if (!drawerRef.current) return
+      if (mobileOpen && !drawerRef.current.contains(e.target as Node)) closeDrawer()
     }
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setMobileOpen(false)
+      if (e.key === 'Escape') closeDrawer()
     }
     document.addEventListener('mousedown', handleOutside)
     document.addEventListener('keydown', onKey)
     return () => {
       document.removeEventListener('mousedown', handleOutside)
       document.removeEventListener('keydown', onKey)
+      if (closeTimeoutRef.current) window.clearTimeout(closeTimeoutRef.current)
     }
   }, [mobileOpen])
 
+  function openDrawer() {
+    if (closeTimeoutRef.current) { window.clearTimeout(closeTimeoutRef.current); closeTimeoutRef.current = null }
+    setMobileOpen(true)
+    // prevent body scroll when drawer open
+    try { document.body.style.overflow = 'hidden' } catch {}
+  }
+  function closeDrawer() {
+    // trigger closing animation by toggling a class; we use CSS .closing state
+    const el = drawerRef.current
+    if (!el) { setMobileOpen(false); try { document.body.style.overflow = '' } catch {} ; return }
+    el.classList.add('closing')
+    // wait for animation then fully close
+    closeTimeoutRef.current = window.setTimeout(() => {
+      el.classList.remove('closing')
+      setMobileOpen(false)
+      try { document.body.style.overflow = '' } catch {}
+    }, 260)
+  }
+
+  // hide transfer button on small screens via CSS (Tailwind responsive)
+  // make desktop button adaptive: use padding and max-width, keep it subtle
   const prefersReduced = typeof window !== 'undefined' && window.matchMedia
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
     : false
@@ -59,7 +81,7 @@ export default function Header({ onOpenModal, isEn }: Props) {
         <div className="flex items-center gap-4">
           <Link href="/">
             <a className="flex items-center gap-3 focus:outline-none" aria-label="Bvetra — Главная">
-              <AnimatedLogo className="w-10 h-10" />
+              <AnimatedLogo className="w-10 h-6" />
               <span className={`${prefersReduced ? '' : 'motion-fadeInUp'} font-bold text-lg`}>Bvetra</span>
             </a>
           </Link>
@@ -73,16 +95,29 @@ export default function Header({ onOpenModal, isEn }: Props) {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Desktop-only transfer button: hidden on small screens */}
           <button
             onClick={onOpenModal}
-            className="rounded-2xl px-4 py-2 font-semibold text-graphite"
-            style={{ backgroundColor: 'var(--primary)' }}
+            className="hidden sm:inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
+            style={{
+              backgroundColor: 'var(--primary)',
+              color: 'var(--text)',
+              minWidth: 150,
+              justifyContent: 'center'
+            }}
             aria-haspopup="dialog"
             aria-label="Заказать трансфер"
           >
-            ЗАКАЗАТЬ ТРАНСФЕР
+            <svg width="16" height="12" viewBox="0 0 24 16" fill="none" aria-hidden="true" focusable="false">
+              <path d="M2 10h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M6 6h12l2 4H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="7" cy="12" r="1.6" fill="currentColor" />
+              <circle cx="15" cy="12" r="1.6" fill="currentColor" />
+            </svg>
+            <span>ЗАКАЗАТЬ ТРАНСФЕР</span>
           </button>
 
+          {/* Theme toggle */}
           <button
             onClick={() => setDark(d => !d)}
             className="px-3 py-2 rounded hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-1"
@@ -95,11 +130,13 @@ export default function Header({ onOpenModal, isEn }: Props) {
 
           <Link href={langHref}><a className="px-2 py-1 rounded hover:bg-gray-100 text-sm">{isEn ? 'RU' : 'EN'}</a></Link>
 
+          {/* Hamburger */}
           <button
             className="md:hidden p-2 rounded hover:bg-gray-100 focus:outline-none focus:ring-2"
-            onClick={() => setMobileOpen(s => !s)}
+            onClick={() => (mobileOpen ? closeDrawer() : openDrawer())}
             aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
+            aria-label={mobileOpen ? 'Закрыть меню' : 'Открыть меню'}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               {mobileOpen ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /> : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />}
@@ -108,29 +145,50 @@ export default function Header({ onOpenModal, isEn }: Props) {
         </div>
       </div>
 
-      {/* Mobile menu */}
-      <div id="mobile-menu" ref={mobileRef} className={`md:hidden bg-white dark:bg-[color:var(--glass)] border-t overflow-hidden transition-[max-height] duration-300 ${mobileOpen ? 'max-h-80' : 'max-h-0'}`}>
-        <div className="px-4 py-3 flex flex-col gap-3 text-sm">
-          <a href="#about" onClick={() => setMobileOpen(false)} className="block">О нас</a>
-          <a href="#services" onClick={() => setMobileOpen(false)} className="block">Услуги</a>
-          <a href="#fleet" onClick={() => setMobileOpen(false)} className="block">Автопарк</a>
-          <Link href="/vacancies"><a onClick={() => setMobileOpen(false)} className="block">Вакансии</a></Link>
+      {/* Mobile drawer (slide-in from right) */}
+      <div
+        id="mobile-menu"
+        ref={drawerRef}
+        className={`mobile-drawer ${mobileOpen ? 'open' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-hidden={!mobileOpen}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <AnimatedLogo className="w-10 h-6" />
+            <span className="font-bold">Bvetra</span>
+          </div>
 
-          <div className="pt-2 border-t mt-2 flex items-center justify-between">
-            <button onClick={() => { onOpenModal?.(); setMobileOpen(false) }} className="rounded-2xl px-3 py-2 font-semibold text-graphite" style={{ backgroundColor: 'var(--primary)' }}>ЗАКАЗАТЬ ТРАНСФЕР</button>
-            <button onClick={() => { setDark(d => !d); setMobileOpen(false) }} className="px-2 py-1 rounded">{dark ? '🌜' : '☀️'}</button>
+          <button
+            onClick={closeDrawer}
+            className="p-2 rounded focus:outline-none"
+            aria-label="Закрыть меню"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+
+        <nav className="flex flex-col gap-3">
+          <a href="#about" onClick={closeDrawer} className="px-2 py-2 rounded hover:bg-[color:var(--primary)]/10">О нас</a>
+          <a href="#services" onClick={closeDrawer} className="px-2 py-2 rounded hover:bg-[color:var(--primary)]/10">Услуги</a>
+          <a href="#fleet" onClick={closeDrawer} className="px-2 py-2 rounded hover:bg-[color:var(--primary)]/10">Автопарк</a>
+          <Link href="/vacancies"><a onClick={closeDrawer} className="px-2 py-2 rounded hover:bg-[color:var(--primary)]/10">Вакансии</a></Link>
+        </nav>
+
+        <div className="mt-auto pt-4 border-t flex items-center justify-between">
+          {/* Transfer button intentionally omitted on mobile, per request */}
+          <div />
+          <div className="flex items-center gap-3">
+            <button onClick={() => { setDark(d => !d); }} className="px-3 py-2 rounded">
+              {dark ? '🌜' : '☀️'}
+            </button>
+            <Link href={langHref}><a onClick={closeDrawer} className="px-2 py-1 rounded"> {isEn ? 'RU' : 'EN'} </a></Link>
           </div>
         </div>
       </div>
-
-      {/* Back to top */}
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: prefersReduced ? 'auto' : 'smooth' })}
-        aria-label="Наверх"
-        className={`fixed right-4 bottom-6 z-40 rounded-full bg-graphite text-white p-3 shadow-lg transition-opacity duration-300 ${showTop ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
-      >
-        ↑
-      </button>
     </header>
   )
 }
