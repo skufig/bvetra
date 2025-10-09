@@ -21,3 +21,9 @@ npm run dev
 
 ## Deploy
 Recommended: Vercel (automatic Next.js support). Ensure environment variable `BITRIX_WEBHOOK_URL` is set in deployment settings.
+
+
+## Notes added by assistant
+- Language switching implemented via `src/context/LanguageContext.tsx` and `src/components/LanguageSwitcher.tsx`. Buttons RU / EN in header save preference to localStorage.
+- I wired Header and Footer to use language context.
+- Minor layout/tailwind tweaks added in src/styles/globals.css.
