@@ -12,7 +12,7 @@
   --header-height: 72px;
 }
 
-/* Dark theme: coffee with milk tones */
+/* Dark theme: coffee with milk */
 html.dark {
   --bg: #f0e7e2; /* coffee-100 */
   --text: #1f1410;
@@ -42,7 +42,39 @@ body {
   background-color: var(--glass);
 }
 
-/* Respect reduced motion */
+/* Mobile menu container styles for slide-in */
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100dvh;
+  width: min(92vw, 420px);
+  max-width: 420px;
+  z-index: 60;
+  background-color: var(--bg);
+  box-shadow: -12px 0 40px rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Active states controlled by JS class */
+.mobile-drawer.open {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+  animation: slideInRight 320ms cubic-bezier(.2,.9,.3,1) both;
+}
+.mobile-drawer.closing {
+  animation: slideOutRight 240ms cubic-bezier(.4,.0,.2,1) both;
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
