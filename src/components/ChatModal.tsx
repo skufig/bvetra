@@ -4,7 +4,8 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 
 type Msg = { id: string; role: 'user' | 'assistant' | 'system'; text: string }
 
-export default function ChatModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+export default function ChatModal({ open, onClose, lang }: { open: boolean; onClose: () => void; lang?: "ru" | "en" }) {
+
   const [lang, setLang] = useState<'ru' | 'en'>('ru')
   const isEn = lang === 'en'
   const [messages, setMessages] = useState<Msg[]>([])
