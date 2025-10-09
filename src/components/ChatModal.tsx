@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FiX, FiSend, FiLoader, FiZap, FiMessageCircle, FiMic } from 'react-icons/fi';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
-import { useLanguage } from '@/app/context/LanguageContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 type Msg = { id: string; role: 'user' | 'assistant' | 'system'; text: string };
 
