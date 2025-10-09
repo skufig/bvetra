@@ -7,8 +7,7 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
   const rafRef = useRef<number | null>(null)
   const startRef = useRef<number | null>(null)
 
-  // Animation settings
-  const LOOP_DURATION = 28000 // ms — long, mesmerizing loop
+  const LOOP_DURATION = 30000 // long, smooth loop in ms
   const REDUCED_MOTION = typeof window !== 'undefined' && window.matchMedia
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
     : false
@@ -21,44 +20,38 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
     const path = pathRef.current
     if (!svg || !car || !path) return
 
-    // If browser supports SMIL, it will run automatically.
-    // We still provide JS fallback for browsers without SMIL (some WebKit builds).
-    const supportsSMIL = typeof (document.createElementNS as any) === 'function' &&
-      !!(svg.querySelector('animateMotion') && (svg.querySelector('animateMotion') as SVGElement).getAttribute)
+    // detect SMIL support (modern WebKit may block SMIL; fallback will run if unsupported)
+    const supportsSMIL = (() => {
+      try {
+        return typeof (document.createElementNS as any) === 'function' &&
+          !!svg.querySelector('animateMotion')
+      } catch {
+        return false
+      }
+    })()
 
     if (supportsSMIL) {
-      return // let SMIL handle it
+      return // let SMIL run where available
     }
 
-    // Precompute path length and steps
     const pathLen = path.getTotalLength()
+    const ease = (t: number) => (1 - Math.cos(Math.PI * t)) / 2
 
-    // Easing function (smooth in-out)
-    const easeInOutSine = (t: number) => (1 - Math.cos(Math.PI * t)) / 2
-
-    function step(timestamp: number) {
-      if (!startRef.current) startRef.current = timestamp
-      const elapsed = (timestamp - startRef.current) % LOOP_DURATION
-      const t = elapsed / LOOP_DURATION // 0..1
-      const eased = easeInOutSine(t)
-
-      // For figure-eight effect we map eased to path length (0..1)
-      // But to make motion continuous (no abrupt jumps) we travel forward along path with loop
+    function step(ts: number) {
+      if (!startRef.current) startRef.current = ts
+      const elapsed = (ts - startRef.current) % LOOP_DURATION
+      const t = elapsed / LOOP_DURATION
+      const eased = ease(t)
       const dist = eased * pathLen
 
-      const point = path.getPointAtLength(dist)
-      // get tangent to rotate car: small delta forward on path
+      const p = path.getPointAtLength(dist)
       const delta = 0.5
-      const nextPoint = path.getPointAtLength(Math.min(dist + delta, pathLen))
-      const angle = Math.atan2(nextPoint.y - point.y, nextPoint.x - point.x) * (180 / Math.PI)
+      const next = path.getPointAtLength(Math.min(dist + delta, pathLen))
+      const angle = Math.atan2(next.y - p.y, next.x - p.x) * (180 / Math.PI)
 
-      // Position car: translate so car's internal origin lines up correctly
-      // Car group initial transform used translate(-24,-12) in original SVG,
-      // we counteract that by applying translate to place car center at point.
-      // Adjust offsets to visually center the car on the path.
-      const offsetX = -24
-      const offsetY = -12
-      car.setAttribute('transform', `translate(${point.x + offsetX}, ${point.y + offsetY}) rotate(${angle})`)
+      const offsetX = -28
+      const offsetY = -18
+      car.setAttribute('transform', `translate(${p.x + offsetX}, ${p.y + offsetY}) rotate(${angle})`)
 
       rafRef.current = window.requestAnimationFrame(step)
     }
@@ -75,9 +68,9 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
   return (
     <svg
       ref={svgRef}
-      viewBox="0 0 320 140"
+      viewBox="0 0 360 160"
       width="160"
-      height="70"
+      height="72"
       className={className}
       role="img"
       aria-label="Bvetra animated logo"
@@ -85,86 +78,85 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
       xmlnsXlink="http://www.w3.org/1999/xlink"
     >
       <defs>
-        <linearGradient id="lg" x1="0" x2="1">
-          <stop offset="0%" stopColor="var(--primary)" />
-          <stop offset="100%" stopColor="var(--primary-600)" />
+        <linearGradient id="orangeGrad" x1="0" x2="1">
+          <stop offset="0%" stopColor="#ff9a3c" />
+          <stop offset="100%" stopColor="#ff6a00" />
         </linearGradient>
 
-        <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow dx="0" dy="8" stdDeviation="12" floodColor="rgba(0,0,0,0.36)" />
+        <filter id="drop" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="8" stdDeviation="10" floodColor="rgba(0,0,0,0.28)" />
         </filter>
 
-        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="6" result="coloredBlur" />
-          <feMerge>
-            <feMergeNode in="coloredBlur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-
+        <!-- figure-eight path -->
         <path
-          id="figure8"
-          ref={pathRef as any}
-          d="M160,70
-             C 235,10 300,10 235,70
-             C 170,130 90,130 160,70
-             C 230,10 120,10 160,70 Z"
+          id="figure8path"
+          d="M180,80 C 260,10 340,10 260,80 C 200,150 120,150 180,80 C 240,10 140,10 180,80 Z"
           fill="none"
         />
       </defs>
 
-      {/* faint guide */}
-      <g opacity="0.06" transform="translate(0,0)">
-        <use href="#figure8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      {/* faint guide curve (decorative) */}
+      <g opacity="0.06">
+        <use href="#figure8path" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
       </g>
 
       {/* glow trail */}
       <g aria-hidden="true">
         <path
-          id="trail"
-          d="M160,70 C 235,10 300,10 235,70 C 170,130 90,130 160,70 C 230,10 120,10 160,70 Z"
-          stroke="url(#lg)"
+          d="M180,80 C 260,10 340,10 260,80 C 200,150 120,150 180,80 C 240,10 140,10 180,80 Z"
+          stroke="url(#orangeGrad)"
           strokeWidth="6"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
-          opacity="0.18"
-          filter="url(#glow)"
+          opacity="0.16"
+          filter="url(#drop)"
         />
       </g>
 
-      {/* car group - main element to animate */}
-      <g id="car" ref={carRef as any} transform="translate(-24,-12)" filter="url(#softShadow)">
-        <g id="carBody" transform="scale(1)" fill="url(#lg)">
-          <path d="M22 48 L54 28 L212 28 L244 48 L256 60 Q262 74 250 86 L228 96 L54 96 Q42 92 30 86 Q18 80 22 48 Z" />
-          <path d="M132 30 L158 30 L172 44 L142 44 Z" fill="rgba(255,255,255,0.18)" />
-          <rect x="228" y="24" width="18" height="6" rx="1.5" fill="rgba(0,0,0,0.12)" transform="rotate(8 237 27)" />
+      {/* car group - silhouette in bold black, orange accents for wheels and motion lines */}
+      <g id="car" ref={carRef as any} transform="translate(-28,-18)" filter="url(#drop)">
+        {/* body - bold black silhouette */}
+        <g id="body" fill="#0b0b0b">
+          <path d="M28 56 L64 34 L304 34 L340 56 L356 74 Q362 94 344 108 L316 122 L64 122 Q50 118 36 108 Q22 98 28 56 Z" />
+          <path d="M170 36 L204 36 L222 52 L186 52 Z" fill="rgba(255,255,255,0.12)" />
         </g>
 
-        <g id="wheels" fill="#050505">
-          <g transform="translate(80,96)">
-            <circle cx="0" cy="0" r="10" />
-            <circle cx="0" cy="0" r="3" fill="rgba(255,255,255,0.12)" />
+        {/* wheels - orange rims */}
+        <g id="wheels">
+          <g transform="translate(96,126)">
+            <circle cx="0" cy="0" r="12" fill="#111" />
+            <circle cx="0" cy="0" r="6.2" fill="url(#orangeGrad)" />
           </g>
-          <g transform="translate(210,98)">
-            <circle cx="0" cy="0" r="10" />
-            <circle cx="0" cy="0" r="3" fill="rgba(255,255,255,0.12)" />
+          <g transform="translate(268,130)">
+            <circle cx="0" cy="0" r="12" fill="#111" />
+            <circle cx="0" cy="0" r="6.2" fill="url(#orangeGrad)" />
           </g>
         </g>
+
+        {/* subtle orange stripe */}
+        <path d="M64 64 C 120 46 240 46 312 64" stroke="url(#orangeGrad)" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.9" />
       </g>
 
-      {/* SMIL animateMotion as primary method (keeps max smoothness where supported) */}
+      {/* motion lines above car (orange) */}
+      <g id="motionLines" stroke="url(#orangeGrad)" strokeWidth="3" strokeLinecap="round" opacity="0.95">
+        <path d="M14 28 L40 20" />
+        <path d="M6 40 L48 26" />
+        <path d="M24 12 L60 28" />
+      </g>
+
+      {/* SMIL animateMotion primary; JS fallback in useEffect handles unsupported SMIL */}
       <g style={{ display: REDUCED_MOTION ? 'none' : undefined }}>
-        <animateMotion xlinkHref="#car" href="#car" dur="28s" repeatCount="indefinite" rotate="auto">
-          <mpath xlinkHref="#figure8" />
+        <animateMotion xlinkHref="#car" href="#car" dur="30s" repeatCount="indefinite" rotate="auto">
+          <mpath xlinkHref="#figure8path" />
         </animateMotion>
 
         <animateTransform
-          xlinkHref="#carBody"
+          xlinkHref="#body"
           attributeName="transform"
           type="scale"
-          dur="9s"
-          values="1;1.015;1"
+          dur="8s"
+          values="1;1.01;1"
           keyTimes="0;0.5;1"
           repeatCount="indefinite"
         />
@@ -181,12 +173,14 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
         />
       </g>
 
+      {/* CSS for pulsing trail and hover micro-parallax; respects reduced motion */}
       <style jsx>{`
         svg { display: block; overflow: visible; }
         @media (prefers-reduced-motion: no-preference) {
-          #trail { animation: pulse 6.4s ease-in-out infinite; }
-          @keyframes pulse { 0%{ opacity:0.08 } 50%{ opacity:0.22 } 100%{ opacity:0.08 } }
-          svg:hover #car { transform-origin: center; transition: transform 420ms ease; transform: translateY(-2px) scale(1.003); }
+          #trail, #motionLines { animation: pulse 6.8s ease-in-out infinite; }
+          @keyframes pulse { 0% { opacity: 0.06 } 50% { opacity: 0.2 } 100% { opacity: 0.06 } }
+          svg:hover #car { transform-origin: center; transition: transform 420ms ease; transform: translateY(-3px) scale(1.004); }
+          #motionLines { transform-origin: center; animation-duration: 4.2s; }
         }
         @media (prefers-reduced-motion: reduce) {
           #car animateMotion, #car animateTransform, #wheels animateTransform { display: none; }
@@ -194,4 +188,4 @@ export default function AnimatedLogo({ className = '' }: { className?: string })
       `}</style>
     </svg>
   )
-}
+      }
