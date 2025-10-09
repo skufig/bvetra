@@ -1,5 +1,5 @@
 // src/components/Footer.tsx
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FiPhone, FiMail, FiClock, FiInstagram } from 'react-icons/fi'
 import { FaTelegramPlane } from 'react-icons/fa'
 import BookingModal from './BookingModal'
@@ -8,25 +8,24 @@ import ProfileModal from './ProfileModal'
 import BottomNav from './BottomNav'
 
 export default function Footer() {
-  const [lang, setLang] = useState<'ru'|'en'> ( (typeof window !== 'undefined' && (localStorage.getItem('lang') as 'ru'|'en')) || 'ru' )
+  const [lang, setLang] = useState<'ru'|'en'>('ru')
+  useEffect(()=>{ try{ const l = localStorage.getItem('lang'); if(l==='en' || l==='ru') setLang(l) }catch{} },[])
   const isEn = lang==='en'
   const [openBooking, setOpenBooking] = useState(false)
   const [openChat, setOpenChat] = useState(false)
   const [openProfile, setOpenProfile] = useState(false)
 
-  function switchLang(to:'ru'|'en') {
-    setLang(to); try{ localStorage.setItem('lang', to) }catch{}
-  }
+  function switchLang(to:'ru'|'en'){ setLang(to); try{ localStorage.setItem('lang', to) }catch{} }
 
   return (
     <>
-      <footer className="bg-white dark:bg-[#050607] border-t">
+      <footer className="bg-white dark:bg-[#061018] border-t">
         <div className="mx-auto max-w-6xl px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-8 rounded flex items-center justify-center bg-indigo-50 text-indigo-600 font-bold">Bv</div>
               <div>
-                <div className="font-semibold">{isEn ? 'Bvetra' : 'Bvetra'}</div>
+                <div className="font-semibold">Bvetra</div>
                 <div className="text-sm text-gray-500">{isEn ? 'Corporate transfers' : 'Корпоративные трансферы'}</div>
               </div>
             </div>
