@@ -1,4 +1,5 @@
 // pages/_app.tsx (пример добавления Footer)
+import '../src/polyfills';
 import '../src/styles/globals.css'
 import type { AppProps } from 'next/app'
 import { useEffect } from 'react'
